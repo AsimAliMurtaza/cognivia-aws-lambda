@@ -9,6 +9,7 @@ export interface ICourse extends Document {
   students: mongoose.Types.ObjectId[];
   createdAt: Date;
   joinCode: string;
+  teacher: mongoose.Types.ObjectId;
   assignments: mongoose.Types.ObjectId[];
 }
 
@@ -24,6 +25,11 @@ const CourseSchema: Schema = new Schema(
       required: true,
     },
     students: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],
+    teacher: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+      required: true,
+    },
     joinCode: { type: String, unique: true },
     assignments: [{ type: mongoose.Schema.Types.ObjectId, ref: "Assignment" }],
   },

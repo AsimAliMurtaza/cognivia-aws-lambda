@@ -22,6 +22,7 @@ export async function POST(req: NextRequest) {
     level,
     createdBy: session.user.id,
     joinCode: code,
+    teacher: session.user.id,
     assignments: [],
     students: [],
   });

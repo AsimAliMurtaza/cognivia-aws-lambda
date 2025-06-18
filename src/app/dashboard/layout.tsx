@@ -48,19 +48,21 @@ import { IconType } from "react-icons/lib";
 import { motion, AnimatePresence } from "framer-motion";
 import { useSession, signOut } from "next-auth/react";
 import SessionLogger from "@/components/SessionLogger";
+import { MdClass } from "react-icons/md";
 
 const MotionBox = motion(Box);
 
 const modules = [
   { name: "Overview", icon: BiHome, path: "/dashboard" },
+  { name: "Enrolled Classes", icon: MdClass, path: "/dashboard/courses" },
   { name: "Quizzes", icon: FiBook, path: "/dashboard/quizzes" },
   {
     name: "Cognivia AI",
     icon: FiMessageSquare,
     path: "/dashboard/assistant",
   },
-  { name: "Reports", icon: FiBarChart2, path: "/dashboard/performance" },
   { name: "Smart Notes", icon: FiEdit, path: "/dashboard/notes" },
+  { name: "Reports", icon: FiBarChart2, path: "/dashboard/performance" },
   { name: "Settings", icon: FiSettings, path: "/dashboard/settings" },
 ];
 
@@ -80,7 +82,10 @@ const DashboardLayout = ({ children }: { children: ReactNode }) => {
   const primaryColor = useColorModeValue("teal.600", "blue.300");
   const dividerColor = useColorModeValue("gray.200", "gray.600");
   const surfaceColor = useColorModeValue("gray.50", "gray.900");
-  const menuListColor = useColorModeValue("rgba(255, 255, 255, 0.8)", "rgba(26, 32, 44, 0.8)");
+  const menuListColor = useColorModeValue(
+    "rgba(255, 255, 255, 0.8)",
+    "rgba(26, 32, 44, 0.8)"
+  );
 
   if (status === "loading")
     return (
@@ -187,7 +192,7 @@ const DashboardLayout = ({ children }: { children: ReactNode }) => {
           {!collapsed ? "Upgrade" : <BiRocket size={20} />}
         </Button>
 
-        <Menu 
+        <Menu
           onOpen={() => setIsMenuOpen(true)}
           onClose={() => setIsMenuOpen(false)}
         >
@@ -229,7 +234,7 @@ const DashboardLayout = ({ children }: { children: ReactNode }) => {
             </MenuButton>
           </Tooltip>
 
-          <MenuList 
+          <MenuList
             backdropFilter="blur(10px)"
             bg={menuListColor}
             border="none"
