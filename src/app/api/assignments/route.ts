@@ -1,3 +1,4 @@
+// POST /api/assignments
 import { NextResponse } from "next/server";
 import connectDB from "@/lib/mongodb";
 import Assignment from "@/models/Assignment";
@@ -7,14 +8,6 @@ export async function POST(req: Request) {
   try {
     await connectDB();
     const data = await req.json();
-
-    // Validate required fields
-    if (!data.title || !data.dueDate || !data.courseId) {
-      return NextResponse.json(
-        { error: "Title, due date, and course ID are required" },
-        { status: 400 }
-      );
-    }
 
     // Create the assignment
     const assignment = await Assignment.create(data);
