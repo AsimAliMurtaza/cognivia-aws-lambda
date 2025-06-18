@@ -307,14 +307,14 @@ export default function CoursesPage() {
       );
     }
 
-    // If students are populated user objects
-    return (
-      <AvatarGroup size="sm" max={3}>
-        {(students as User[]).map((student) => (
-          <Avatar key={student._id} name={student.name} src={student.avatar} />
-        ))}
-      </AvatarGroup>
-    );
+    // // If students are populated user objects
+    // return (
+    //   <AvatarGroup size="sm" max={3}>
+    //     {(students as User[]).map((student) => (
+    //       <Avatar key={student._id} name={student?.name} src={student?.avatar} />
+    //     ))}
+    //   </AvatarGroup>
+    // );
   };
 
   if (loading) {
@@ -426,7 +426,9 @@ export default function CoursesPage() {
                   </Text>
                   {getStudentAvatars(course.students) || (
                     <Text fontSize="sm" color="gray.500">
-                      None enrolled
+                      {course.students.length === 0
+                        ? "No students enrolled"
+                        : `${course.students.length} student(s)`}
                     </Text>
                   )}
                 </Flex>

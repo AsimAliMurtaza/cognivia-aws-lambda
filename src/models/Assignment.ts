@@ -1,12 +1,5 @@
 import mongoose from "mongoose";
 
-// Define the interface for a single submission
-interface ISubmission {
-  studentId: mongoose.Types.ObjectId;
-  fileUrl: string;
-  submittedAt?: Date; // Optional field
-}
-
 // Define the interface for the Assignment document
 // Extends mongoose.Document (or Document<any, {}, IAssignment> for newer Mongoose versions)
 interface IAssignment extends mongoose.Document {
@@ -15,7 +8,6 @@ interface IAssignment extends mongoose.Document {
   description: string;
   dueDate: Date;
   fileUrl?: string; // Made optional as not all assignments might have an initial file
-  submissions: ISubmission[];
   createdAt?: Date;
   updatedAt?: Date;
 }
@@ -45,25 +37,6 @@ const AssignmentSchema = new mongoose.Schema<IAssignment>(
       type: String,
       default: "", // Default to empty string
     }, // Google Drive file link for assignment details/resources
-
-    // Correct way to define an array of subdocuments
-    submissions: [
-      {
-        studentId: {
-          type: mongoose.Schema.Types.ObjectId,
-          ref: "User", // Assuming a 'User' model for students
-          required: true,
-        },
-        fileUrl: {
-          type: String,
-          required: true, // Submission must have a file
-        },
-        submittedAt: {
-          type: Date,
-          default: Date.now, // Automatically set submission time
-        },
-      },
-    ],
   },
   { timestamps: true } // Automatically adds createdAt and updatedAt fields
 );
