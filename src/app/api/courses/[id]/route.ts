@@ -1,20 +1,28 @@
-// app/api/courses/[id]/route.ts
 import { NextRequest, NextResponse } from "next/server";
 import connectDB from "@/lib/mongodb";
-import Course from "@/models/Course";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/api/auth/[...nextauth]/options";
+
+import Assignment from "@/models/Assignment";
+import CourseModel from "@/models/Course";
 import mongoose from "mongoose";
 
 export async function GET(
-  req: NextRequest,
+  req: Request,
   { params }: { params: { id: string } }
 ) {
   await connectDB();
-  const course = await Course.findById(params.id);
-  if (!course)
-    return NextResponse.json({ error: "Not found" }, { status: 404 });
-  return NextResponse.json(course);
+
+  mongoose.models.Assignment = Assignment; // Ensure Assignment model is registered
+
+  // ❗️This works because Assignment is registered above
+  const course = await CourseModel.findById(params.id).populate("assignments");
+
+  if (!course) {
+    return new Response("Not found", { status: 404 });
+  }
+
+  return Response.json(course);
 }
 
 export async function PUT(
@@ -23,23 +31,26 @@ export async function PUT(
 ) {
   await connectDB();
   const session = await getServerSession(authOptions);
+
   if (!session || session?.user?.role !== "teacher") {
     return NextResponse.json({ error: "Unauthorized" }, { status: 403 });
   }
 
   const updates = await req.json();
-  const course = await Course.findOneAndUpdate(
+  const updated = await CourseModel.findOneAndUpdate(
     { _id: params.id, createdBy: session.user.id },
     updates,
     { new: true }
   );
 
-  if (!course)
+  if (!updated) {
     return NextResponse.json(
       { error: "Not found or not allowed" },
       { status: 404 }
     );
-  return NextResponse.json(course);
+  }
+
+  return NextResponse.json(updated);
 }
 
 export async function DELETE(
@@ -48,19 +59,22 @@ export async function DELETE(
 ) {
   await connectDB();
   const session = await getServerSession(authOptions);
+
   if (!session || session?.user?.role !== "teacher") {
     return NextResponse.json({ error: "Unauthorized" }, { status: 403 });
   }
 
-  const course = await Course.findOneAndDelete({
+  const deleted = await CourseModel.findOneAndDelete({
     _id: params.id,
     createdBy: session.user.id,
   });
 
-  if (!course)
+  if (!deleted) {
     return NextResponse.json(
       { error: "Not found or not allowed" },
       { status: 404 }
     );
+  }
+
   return NextResponse.json({ message: "Deleted successfully" });
 }
