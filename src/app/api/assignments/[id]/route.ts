@@ -2,8 +2,12 @@ import { NextResponse } from "next/server";
 import connectDB from "@/lib/mongodb";
 import Assignment from "@/models/Assignment";
 import Course from "@/models/Course";
+import { deleteFileFromS3 } from "@/lib/s3";
 
-export async function PUT(req: Request, { params }: { params: { id: string } }) {
+export async function PUT(
+  req: Request,
+  { params }: { params: { id: string } }
+) {
   try {
     await connectDB();
     const data = await req.json();
@@ -64,6 +68,8 @@ export async function DELETE(
     });
 
     // TODO: Add code here to delete any associated files from storage
+    // For example, if using AWS S3, you would call the S3 delete method here
+    await deleteFileFromS3(assignment.fileUrl);
 
     return NextResponse.json(
       { message: "Assignment deleted successfully" },
@@ -78,7 +84,10 @@ export async function DELETE(
   }
 }
 
-export async function GET(req: Request, { params }: { params: { id: string } }) {
+export async function GET(
+  req: Request,
+  { params }: { params: { id: string } }
+) {
   try {
     await connectDB();
     const assignment = await Assignment.findById(params.id);
