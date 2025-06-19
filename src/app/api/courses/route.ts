@@ -20,6 +20,7 @@ export async function POST(req: NextRequest) {
     description,
     subject,
     level,
+    liveClasses: [],
     createdBy: session.user.id,
     joinCode: code,
     teacher: session.user.id,
@@ -32,6 +33,9 @@ export async function POST(req: NextRequest) {
 
 export async function GET() {
   await connectDB();
-  const courses = await Course.find().populate("createdBy", "name email");
+  const courses = await Course.find()
+    .populate("createdBy", "name email") // Populate teacher details
+    .populate("liveClasses"); // Populate liveClasses if needed
+
   return NextResponse.json(courses);
 }

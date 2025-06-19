@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { useParams, useRouter } from "next/navigation";
 import {
   Box,
@@ -18,7 +18,6 @@ import {
   AlertDialogBody,
   AlertDialogFooter,
 } from "@chakra-ui/react";
-import { useRef } from "react";
 
 export default function CourseDetailPage() {
   const params = useParams();
@@ -29,14 +28,26 @@ export default function CourseDetailPage() {
   const toast = useToast();
   const { isOpen, onOpen, onClose } = useDisclosure();
   const cancelRef = useRef(null);
+  const [liveClasses, setLiveClasses] = useState<any[]>([]);
 
   useEffect(() => {
-    fetch(`/api/courses/${id}`)
-      .then((res) => res.json())
-      .then((data) => {
-        console.log("Fetched course data:", data);
-        setCourse(data);
-      });
+    const fetchCourse = async () => {
+      const res = await fetch(`/api/courses/${id}`);
+      const data = await res.json();
+      setCourse(data);
+
+      if (data.liveClasses && data.liveClasses.length > 0) {
+        const liveClassDetails = await Promise.all(
+          data.liveClasses.map(async (lcId: string) => {
+            const res = await fetch(`/api/live-classes/${lcId}`);
+            return await res.json();
+          })
+        );
+        setLiveClasses(liveClassDetails);
+      }
+    };
+
+    if (id) fetchCourse();
   }, [id]);
 
   const handleUnenroll = async () => {
@@ -55,7 +66,7 @@ export default function CourseDetailPage() {
         isClosable: true,
       });
 
-      router.push("/dashboard"); // or /dashboard/courses
+      router.push("/dashboard");
     } catch (err) {
       console.error(err);
       toast({
@@ -84,6 +95,33 @@ export default function CourseDetailPage() {
       </Flex>
 
       <Text mb={4}>{course.description}</Text>
+
+      {liveClasses.length ? (
+        <Box mb={6}>
+          <Heading size="md" mb={2}>
+            Upcoming Live Classes
+          </Heading>
+          <Stack spacing={4}>
+            {liveClasses.map((lc: any) => (
+              <Box key={lc._id} borderWidth="1px" borderRadius="lg" p={3}>
+                <Text>
+                  Scheduled for: {new Date(lc.scheduledAt).toLocaleString()}
+                </Text>
+                <Button
+                  mt={2}
+                  size="sm"
+                  colorScheme="blue"
+                  onClick={() => router.push(`/live-class/${lc.channelName}`)}
+                >
+                  Join Class
+                </Button>
+              </Box>
+            ))}
+          </Stack>
+        </Box>
+      ) : (
+        <Text mb={6}>No upcoming live classes.</Text>
+      )}
 
       <Heading size="md" mb={2}>
         Assignments
@@ -114,7 +152,6 @@ export default function CourseDetailPage() {
         )}
       </Stack>
 
-      {/* Confirmation Dialog */}
       <AlertDialog
         isOpen={isOpen}
         leastDestructiveRef={cancelRef}
