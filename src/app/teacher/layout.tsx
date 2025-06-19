@@ -55,8 +55,7 @@ import { FaHome } from "react-icons/fa";
 const MotionBox = motion(Box);
 
 const modules = [
-  { name: "Home", icon: FaHome, path: "/teacher" },
-  { name: "Classes", icon: MdClass, path: "/teacher/classes" },
+  { name: "Home", icon: FaHome, path: "/teacher/classes" },
   { name: "Archived Classes", icon: BiArchiveIn, path: "/teacher/archive" },
   { name: "Settings", icon: FiSettings, path: "/teacher/settings" },
 ];

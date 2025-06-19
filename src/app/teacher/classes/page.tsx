@@ -299,13 +299,13 @@ export default function CoursesPage() {
     if (students.length === 0) return null;
 
     // If students are just IDs (strings)
-    if (typeof students[0] === "string") {
-      return (
-        <AvatarGroup size="sm" max={3}>
-          <Avatar name="Student" />
-        </AvatarGroup>
-      );
-    }
+    // if (typeof students[0] === "string") {
+    //   return (
+    //     <AvatarGroup size="sm" max={3}>
+    //       <Avatar name={"students.length"} />
+    //     </AvatarGroup>
+    //   );
+    // }
 
     // // If students are populated user objects
     // return (
