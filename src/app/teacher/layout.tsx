@@ -49,13 +49,14 @@ import { IconType } from "react-icons/lib";
 import { motion, AnimatePresence } from "framer-motion";
 import { useSession, signOut } from "next-auth/react";
 import SessionLogger from "@/components/SessionLogger";
-import { MdClass } from "react-icons/md";
+import { MdClass, MdMeetingRoom } from "react-icons/md";
 import { FaHome } from "react-icons/fa";
 
 const MotionBox = motion(Box);
 
 const modules = [
   { name: "Home", icon: FaHome, path: "/teacher/classes" },
+  { name: "Live Classes", icon: MdMeetingRoom, path: "/teacher/live-classes" },
   { name: "Archived Classes", icon: BiArchiveIn, path: "/teacher/archive" },
   { name: "Settings", icon: FiSettings, path: "/teacher/settings" },
 ];
