@@ -13,7 +13,6 @@ import {
   Card,
   CardBody,
   CardHeader,
-  Stack,
   useColorModeValue,
   Spinner,
   FormControl,
@@ -29,18 +28,38 @@ import {
   FiBookOpen,
   FiClock,
   FiInfo,
-} from "react-icons/fi"; // Added relevant icons
+} from "react-icons/fi";
+
+type Course = {
+  _id: string;
+  title: string;
+};
+
+type LiveClass = {
+  _id: string;
+  title: string;
+  courseId: string;
+  course?: Course;
+  scheduledAt: string;
+  channelName: string;
+};
+
+type FormErrors = {
+  title: string;
+  scheduledAt: string;
+  selectedCourse: string;
+};
 
 export default function LiveClassDashboard() {
   const toast = useToast();
   const [title, setTitle] = useState("");
   const [scheduledAt, setScheduledAt] = useState("");
   const [selectedCourse, setSelectedCourse] = useState("");
-  const [courses, setCourses] = useState([]);
-  const [classes, setClasses] = useState([]);
+  const [courses, setCourses] = useState<Course[]>([]);
+  const [classes, setClasses] = useState<LiveClass[]>([]);
   const [isCreating, setIsCreating] = useState(false);
-  const [isLoadingData, setIsLoadingData] = useState(true); // For initial fetch
-  const [formErrors, setFormErrors] = useState({
+  const [isLoadingData, setIsLoadingData] = useState(true);
+  const [formErrors, setFormErrors] = useState<FormErrors>({
     title: "",
     scheduledAt: "",
     selectedCourse: "",
@@ -59,7 +78,11 @@ export default function LiveClassDashboard() {
 
   const validateForm = () => {
     let isValid = true;
-    const newErrors = { title: "", scheduledAt: "", selectedCourse: "" };
+    const newErrors: FormErrors = {
+      title: "",
+      scheduledAt: "",
+      selectedCourse: "",
+    };
 
     if (!selectedCourse) {
       newErrors.selectedCourse = "Please select a course.";
@@ -109,10 +132,11 @@ export default function LiveClassDashboard() {
       } else {
         throw new Error(classesData.message || "Failed to fetch classes.");
       }
-    } catch (error: any) {
+    } catch (error: unknown) {
+      const err = error as Error;
       toast({
         title: "Error loading data",
-        description: error.message || "Failed to fetch courses or classes.",
+        description: err.message || "Failed to fetch courses or classes.",
         status: "error",
         duration: 5000,
         isClosable: true,
@@ -165,8 +189,8 @@ export default function LiveClassDashboard() {
         setTitle("");
         setScheduledAt("");
         setSelectedCourse("");
-        setFormErrors({ title: "", scheduledAt: "", selectedCourse: "" }); // Clear errors on success
-        fetchAllData(); // Refresh both lists
+        setFormErrors({ title: "", scheduledAt: "", selectedCourse: "" });
+        fetchAllData();
       } else {
         toast({
           title: "Failed to schedule class",
@@ -177,10 +201,11 @@ export default function LiveClassDashboard() {
           position: "top",
         });
       }
-    } catch (error: any) {
+    } catch (error: unknown) {
+      const err = error as Error;
       toast({
         title: "Error",
-        description: error.message || "An unexpected error occurred.",
+        description: err.message || "An unexpected error occurred.",
         status: "error",
         duration: 5000,
         isClosable: true,
@@ -199,8 +224,7 @@ export default function LiveClassDashboard() {
     if (name === "scheduledAt") setScheduledAt(value);
     if (name === "selectedCourse") setSelectedCourse(value);
 
-    // Clear specific error when user starts typing/selecting
-    if (formErrors[name as keyof typeof formErrors]) {
+    if (formErrors[name as keyof FormErrors]) {
       setFormErrors((prev) => ({ ...prev, [name]: "" }));
     }
   };
@@ -220,19 +244,19 @@ export default function LiveClassDashboard() {
 
   // Filter upcoming classes
   const upcomingClasses = classes
-    .filter((cls: any) => new Date(cls.scheduledAt) >= new Date())
+    .filter((cls) => new Date(cls.scheduledAt) >= new Date())
     .sort(
-      (a: any, b: any) =>
+      (a, b) =>
         new Date(a.scheduledAt).getTime() - new Date(b.scheduledAt).getTime()
     );
 
   // Filter past classes
   const pastClasses = classes
-    .filter((cls: any) => new Date(cls.scheduledAt) < new Date())
+    .filter((cls) => new Date(cls.scheduledAt) < new Date())
     .sort(
-      (a: any, b: any) =>
+      (a, b) =>
         new Date(b.scheduledAt).getTime() - new Date(a.scheduledAt).getTime()
-    ); // Newest first
+    );
 
   return (
     <Box p={{ base: 4, md: 8 }} maxW="5xl" mx="auto" bg={bgColor} minH="100vh">
@@ -275,7 +299,7 @@ export default function LiveClassDashboard() {
                     No courses available. Please create one first.
                   </option>
                 ) : (
-                  courses.map((course: any) => (
+                  courses.map((course) => (
                     <option key={course._id} value={course._id}>
                       {course.title}
                     </option>
@@ -340,7 +364,7 @@ export default function LiveClassDashboard() {
               alignSelf="center"
               boxShadow="md"
               _hover={{ boxShadow: "lg", transform: "translateY(-1px)" }}
-              isDisabled={courses.length === 0} // Disable if no courses to select from
+              isDisabled={courses.length === 0}
             >
               Schedule Class
             </Button>
@@ -375,7 +399,7 @@ export default function LiveClassDashboard() {
         </VStack>
       ) : (
         <VStack spacing={5} align="stretch">
-          {upcomingClasses.map((cls: any) => (
+          {upcomingClasses.map((cls) => (
             <Card
               key={cls._id}
               bg={cardBgColor}
@@ -465,7 +489,7 @@ export default function LiveClassDashboard() {
         </VStack>
       ) : (
         <VStack spacing={5} align="stretch">
-          {pastClasses.map((cls: any) => (
+          {pastClasses.map((cls) => (
             <Card
               key={cls._id}
               bg={cardBgColor}
@@ -520,7 +544,7 @@ export default function LiveClassDashboard() {
                     size="md"
                     borderRadius="full"
                     px={6}
-                    isDisabled // Typically, past classes cannot be "started" again
+                    isDisabled
                   >
                     View Class
                   </Button>

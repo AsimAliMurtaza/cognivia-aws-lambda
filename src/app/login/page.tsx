@@ -23,7 +23,7 @@ import {
 import { motion } from "framer-motion";
 import { FcGoogle } from "react-icons/fc";
 import { FaGithub } from "react-icons/fa";
-import { FiArrowLeft, FiSun, FiMoon } from "react-icons/fi";
+import {  FiSun, FiMoon } from "react-icons/fi";
 
 export default function LoginPage() {
   const [email, setEmail] = useState<string>("");

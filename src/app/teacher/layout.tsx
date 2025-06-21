@@ -30,26 +30,20 @@ import {
   useBreakpointValue,
 } from "@chakra-ui/react";
 import {
-  BiHome,
   BiMenuAltLeft,
   BiMenu,
   BiUser,
   BiLogOut,
-  BiRocket,
   BiArchiveIn,
 } from "react-icons/bi";
 import {
-  FiBarChart2,
   FiSettings,
-  FiMessageSquare,
-  FiBook,
-  FiEdit,
 } from "react-icons/fi";
 import { IconType } from "react-icons/lib";
 import { motion, AnimatePresence } from "framer-motion";
 import { useSession, signOut } from "next-auth/react";
 import SessionLogger from "@/components/SessionLogger";
-import { MdClass, MdMeetingRoom } from "react-icons/md";
+import { MdMeetingRoom } from "react-icons/md";
 import { FaHome } from "react-icons/fa";
 
 const MotionBox = motion(Box);

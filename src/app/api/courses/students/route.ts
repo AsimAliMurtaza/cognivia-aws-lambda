@@ -1,5 +1,5 @@
 // src/app/api/courses/student/route.ts
-import { NextRequest, NextResponse } from "next/server";
+import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import dbConnect from "@/lib/mongodb";
 import Course from "@/models/Course";

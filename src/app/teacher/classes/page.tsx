@@ -3,7 +3,6 @@ import {
   Box,
   Heading,
   Text,
-  Stack,
   Spinner,
   Button,
   useToast,
@@ -41,12 +40,11 @@ import {
   AlertDialogFooter,
   AvatarGroup,
   Avatar,
-  useColorModeValue, // Import useColorModeValue for theming
-  useColorMode, // Import useColorMode if needed for toggling
+  useColorModeValue,
   InputGroup,
   InputRightElement,
   Tooltip,
-  HStack, // Added for join code
+  HStack,
 } from "@chakra-ui/react";
 import { useEffect, useState, useRef } from "react";
 import { useRouter } from "next/navigation";
@@ -54,10 +52,9 @@ import {
   DeleteIcon,
   EditIcon,
   HamburgerIcon,
-  AttachmentIcon,
-  CopyIcon, // For copy join code
+  CopyIcon,
 } from "@chakra-ui/icons";
-import { FiPlus, FiBook, FiUsers, FiClipboard, FiShare2 } from "react-icons/fi"; // Added more icons
+import { FiPlus, FiBook, FiUsers, FiShare2 } from "react-icons/fi";
 
 type User = {
   _id: string;
@@ -100,19 +97,13 @@ type Course = {
 export default function CoursesPage() {
   const [courses, setCourses] = useState<Course[]>([]);
   const [loading, setLoading] = useState(true);
-  const [selectedCourse, setSelectedCourse] = useState<Course | null>(null);
   const [form, setForm] = useState({
     title: "",
     description: "",
     subject: "",
     level: "",
   });
-  const [assignmentForm, setAssignmentForm] = useState({
-    title: "",
-    description: "",
-    dueDate: "",
-    file: null as File | null,
-  });
+ 
   const [isDeleteAlertOpen, setIsDeleteAlertOpen] = useState(false);
   const [itemToDelete, setItemToDelete] = useState<{
     id: string;
@@ -122,12 +113,7 @@ export default function CoursesPage() {
 
   const toast = useToast();
   const router = useRouter();
-  const { isOpen, onOpen, onClose } = useDisclosure(); // For Create Course Modal
-  const {
-    isOpen: isAssignmentOpen,
-    onOpen: onAssignmentOpen,
-    onClose: onAssignmentClose,
-  } = useDisclosure(); // For Create Assignment Modal
+  const { isOpen, onOpen, onClose } = useDisclosure();
 
   const isMobile = useBreakpointValue({ base: true, md: false });
 
@@ -141,6 +127,12 @@ export default function CoursesPage() {
   const highlightColor = useColorModeValue("teal.500", "blue.400");
   const spinnerColor = useColorModeValue("teal.500", "blue.300");
   const buttonColor = useColorModeValue("teal", "blue");
+  const avatarGroupBg = useColorModeValue("blue.100", "blue.700");
+  const avatarGroupColor = useColorModeValue("blue.800", "blue.100");
+  const inputCodeBg = useColorModeValue("blue.50", "blue.900");
+  const inputCodeColor = useColorModeValue("blue.700", "blue.200");
+  const hoverBg = useColorModeValue("gray.100", "gray.700");
+
   useEffect(() => {
     fetchCourses();
   }, []);
@@ -154,6 +146,7 @@ export default function CoursesPage() {
       setCourses(data);
       setLoading(false);
     } catch (error) {
+      console.error("Error fetching courses:", error);
       toast({
         title: "Error loading classes",
         description: "Failed to fetch your classes.",
@@ -171,20 +164,6 @@ export default function CoursesPage() {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
-  const handleAssignmentChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
-  ) => {
-    setAssignmentForm({ ...assignmentForm, [e.target.name]: e.target.value });
-  };
-
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files && e.target.files[0]) {
-      setAssignmentForm({
-        ...assignmentForm,
-        file: e.target.files[0],
-      });
-    }
-  };
 
   const handleCreateCourse = async () => {
     try {
@@ -210,72 +189,11 @@ export default function CoursesPage() {
         const errorData = await res.json();
         throw new Error(errorData.message || "Failed to create class");
       }
-    } catch (error: any) {
+    } catch (error: unknown) {
+      const err = error as Error;
       toast({
         title: "Error creating class",
-        description: error.message || "Please try again.",
-        status: "error",
-        duration: 5000,
-        isClosable: true,
-      });
-    }
-  };
-
-  const handleCreateAssignment = async () => {
-    if (!selectedCourse) return;
-
-    try {
-      const formData = new FormData();
-      formData.append("title", assignmentForm.title);
-      formData.append("description", assignmentForm.description);
-      formData.append("dueDate", assignmentForm.dueDate);
-      formData.append("courseId", selectedCourse._id);
-
-      if (assignmentForm.file) {
-        formData.append("file", assignmentForm.file);
-      }
-
-      const res = await fetch("/api/assignments", {
-        method: "POST",
-        body: formData,
-      });
-
-      if (res.ok) {
-        const newAssignment = await res.json();
-        toast({
-          title: "Assignment created!",
-          description: "The assignment has been added to the class.",
-          status: "success",
-          duration: 3000,
-          isClosable: true,
-        });
-
-        const updatedCourses = courses.map((course) => {
-          if (course._id === selectedCourse._id) {
-            return {
-              ...course,
-              assignments: [...(course.assignments || []), newAssignment],
-            };
-          }
-          return course;
-        });
-
-        setCourses(updatedCourses);
-        setAssignmentForm({
-          title: "",
-          description: "",
-          dueDate: "",
-          file: null,
-        });
-        onAssignmentClose();
-      } else {
-        const errorData = await res.json();
-        throw new Error(errorData.message || "Failed to create assignment");
-      }
-    } catch (error: any) {
-      toast({
-        title: "Error creating assignment",
-        description: error.message || "Please try again.",
+        description: err.message || "Please try again.",
         status: "error",
         duration: 5000,
         isClosable: true,
@@ -333,11 +251,12 @@ export default function CoursesPage() {
           errorData.message || `Failed to delete ${itemToDelete.type}`
         );
       }
-    } catch (error: any) {
+    } catch (error: unknown) {
+      const err = error as Error;
       toast({
         title: "Deletion error",
         description:
-          error.message || "Could not delete the item. Please try again.",
+          err.message || "Could not delete the item. Please try again.",
         status: "error",
         duration: 5000,
         isClosable: true,
@@ -351,17 +270,6 @@ export default function CoursesPage() {
   const openDeleteAlert = (id: string, type: "course" | "assignment") => {
     setItemToDelete({ id, type });
     setIsDeleteAlertOpen(true);
-  };
-
-  const formatDate = (dateString: string) => {
-    const options: Intl.DateTimeFormatOptions = {
-      year: "numeric",
-      month: "short",
-      day: "numeric",
-      hour: "2-digit",
-      minute: "2-digit",
-    };
-    return new Date(dateString).toLocaleDateString(undefined, options);
   };
 
   const getStudentAvatars = (students: User[] | string[]) => {
@@ -380,32 +288,31 @@ export default function CoursesPage() {
               key={student._id}
               name={student?.name || "Unknown User"}
               src={student?.avatar}
-              bg={useColorModeValue("blue.100", "blue.700")}
-              color={useColorModeValue("blue.800", "blue.100")}
+              bg={avatarGroupBg}
+              color={avatarGroupColor}
             />
           ))}
         </AvatarGroup>
       );
-    } else {
-      // If students are just IDs or not fully populated, show a count
-      return (
-        <Badge
-          colorScheme="blue"
-          variant="subtle"
-          borderRadius="full"
-          px={3}
-          py={1}
-          ml={1}
-          display="flex"
-          alignItems="center"
-        >
-          <FiUsers style={{ marginRight: "4px" }} />
-          <Text fontSize="xs" fontWeight="bold">
-            {students.length}
-          </Text>
-        </Badge>
-      );
     }
+    // If students are just IDs or not fully populated, show a count
+    return (
+      <Badge
+        colorScheme="blue"
+        variant="subtle"
+        borderRadius="full"
+        px={3}
+        py={1}
+        ml={1}
+        display="flex"
+        alignItems="center"
+      >
+        <FiUsers style={{ marginRight: "4px" }} />
+        <Text fontSize="xs" fontWeight="bold">
+          {students.length}
+        </Text>
+      </Badge>
+    );
   };
 
   const handleCopyJoinCode = (code: string) => {
@@ -479,22 +386,9 @@ export default function CoursesPage() {
             No Classes Yet
           </Heading>
           <Text color={textColor} fontSize="lg" mb={6} maxW="md">
-            It looks like you haven't created any classes. Start by creating
-            your first one!
+            It looks like you haven&apos;t created any classes. Start by
+            creating your first one!
           </Text>
-          <Button
-            colorScheme="blue"
-            onClick={onOpen}
-            size="lg"
-            borderRadius="full"
-            px={8}
-            py={6}
-            fontWeight="semibold"
-            boxShadow="md"
-            _hover={{ boxShadow: "lg", transform: "translateY(-2px)" }}
-          >
-            Create Class Now
-          </Button>
         </Flex>
       ) : (
         <SimpleGrid columns={{ base: 1, md: 2, lg: 3 }} spacing={6}>
@@ -522,7 +416,7 @@ export default function CoursesPage() {
                       variant="ghost"
                       size="sm"
                       borderRadius="full"
-                      _hover={{ bg: useColorModeValue("gray.100", "gray.700") }}
+                      _hover={{ bg: hoverBg }}
                     />
                     <MenuList zIndex={10}>
                       <MenuItem
@@ -617,10 +511,10 @@ export default function CoursesPage() {
                       size="sm"
                       variant="filled"
                       borderRadius="md"
-                      pr="3rem" // Space for the button
+                      pr="3rem"
                       fontWeight="bold"
-                      color={useColorModeValue("blue.700", "blue.200")}
-                      bg={useColorModeValue("blue.50", "blue.900")}
+                      color={inputCodeColor}
+                      bg={inputCodeBg}
                     />
                     <InputRightElement width="3rem">
                       <Tooltip
@@ -660,18 +554,6 @@ export default function CoursesPage() {
                 >
                   Manage Students
                 </Button>
-                {/* Potentially add another button here, e.g., "View Assignments" */}
-                {/* <Button
-                  leftIcon={<AttachmentIcon />}
-                  colorScheme="purple"
-                  variant="outline"
-                  size="sm"
-                  flex="1"
-                  borderRadius="lg"
-                  onClick={() => router.push(`/teacher/classes/${course._id}/assignments`)}
-                >
-                  Assignments
-                </Button> */}
               </CardFooter>
             </Card>
           ))}
@@ -738,7 +620,7 @@ export default function CoursesPage() {
               mr={3}
               onClick={onClose}
               borderRadius="full"
-              _hover={{ bg: useColorModeValue("gray.100", "gray.700") }}
+              _hover={{ bg: hoverBg }}
             >
               Cancel
             </Button>
@@ -791,7 +673,7 @@ export default function CoursesPage() {
                 onClick={() => setIsDeleteAlertOpen(false)}
                 borderRadius="full"
                 variant="ghost"
-                _hover={{ bg: useColorModeValue("gray.100", "gray.700") }}
+                _hover={{ bg: hoverBg }}
               >
                 Cancel
               </Button>

@@ -17,52 +17,72 @@ import {
   AlertDialogHeader,
   AlertDialogBody,
   AlertDialogFooter,
-  Spinner, // For loading state
-  useColorModeValue, // For color mode compatibility
-  Icon, // For icons
+  Spinner,
+  useColorModeValue,
+  Icon,
 } from "@chakra-ui/react";
-import { FaChalkboardTeacher, FaRegFileAlt, FaVideo } from "react-icons/fa"; // Example icons
+import { FaRegFileAlt, FaVideo } from "react-icons/fa";
+
+interface Course {
+  _id: string;
+  title: string;
+  description: string;
+  liveClasses?: string[];
+  assignments?: {
+    _id: string;
+    title: string;
+    description?: string;
+    dueDate: string;
+  }[];
+}
+
+interface LiveClass {
+  _id: string;
+  title: string;
+  scheduledAt: string;
+  channelName: string;
+}
 
 export default function CourseDetailPage() {
   const params = useParams();
   const router = useRouter();
   const id = Array.isArray(params?.id) ? params.id[0] : params?.id;
-  const [course, setCourse] = useState<any>(null);
-  const [isLoadingContent, setIsLoadingContent] = useState(true); // Loading for course data
-  const [isUnenrolling, setIsUnenrolling] = useState(false); // Loading for unenroll action
+  const [course, setCourse] = useState<Course | null>(null);
+  const [isLoadingContent, setIsLoadingContent] = useState(true);
+  const [isUnenrolling, setIsUnenrolling] = useState(false);
   const toast = useToast();
   const { isOpen, onOpen, onClose } = useDisclosure();
-  const cancelRef = useRef(null);
-  const [liveClasses, setLiveClasses] = useState<any[]>([]);
+  const cancelRef = useRef<HTMLButtonElement>(null);
+  const [liveClasses, setLiveClasses] = useState<LiveClass[]>([]);
 
-  // --- Color Mode Values ---
+  // Color Mode Values
   const pageBg = useColorModeValue("gray.50", "gray.900");
   const textColor = useColorModeValue("gray.800", "gray.100");
   const headingColor = useColorModeValue("gray.800", "whiteAlpha.900");
   const descriptionColor = useColorModeValue("gray.600", "gray.300");
-
-  // Card/Box specific colors
   const cardBg = useColorModeValue("white", "gray.800");
   const cardBorder = useColorModeValue("gray.100", "gray.700");
-  const cardShadow = useColorModeValue("md", "dark-lg"); // dark-lg needs to be defined in theme
-
-  // Button colors
+  const cardShadow = useColorModeValue("md", "dark-lg");
   const unenrollButtonScheme = "red";
   const liveClassButtonScheme = "blue";
   const assignmentButtonScheme = "green";
   const cancelButtonScheme = "gray";
-
-  // Alert Dialog colors
   const alertDialogBg = useColorModeValue("white", "gray.800");
   const alertDialogHeaderColor = useColorModeValue(
     "gray.800",
     "whiteAlpha.900"
   );
   const alertDialogBodyColor = useColorModeValue("gray.700", "gray.200");
+  const hoverBg = useColorModeValue("gray.50", "gray.750");
+  const unenrollHoverBg = useColorModeValue("red.600", "red.400");
+  const liveClassHoverBg = useColorModeValue("blue.600", "blue.400");
+  const assignmentHoverBg = useColorModeValue("green.600", "green.400");
+  const cancelHoverBg = useColorModeValue("gray.100", "gray.700");
+  const alertOverlayBg = useColorModeValue("blackAlpha.300", "blackAlpha.600");
 
   useEffect(() => {
     const fetchCourse = async () => {
-      if (!id) return; // Ensure ID exists before fetching
+      if (!id) return;
       setIsLoadingContent(true);
       try {
         const res = await fetch(`/api/courses/${id}`);
@@ -70,7 +90,6 @@ export default function CourseDetailPage() {
         const data = await res.json();
         setCourse(data);
 
-        // Fetch live class details if available
         if (data.liveClasses && data.liveClasses.length > 0) {
           const liveClassPromises = data.liveClasses.map(
             async (lcId: string) => {
@@ -85,11 +104,12 @@ export default function CourseDetailPage() {
         } else {
           setLiveClasses([]);
         }
-      } catch (err: any) {
-        console.error("Failed to fetch course or live classes:", err);
+      } catch (err: unknown) {
+        const error = err as Error;
+        console.error("Failed to fetch course or live classes:", error);
         toast({
           title: "Error loading course",
-          description: err.message || "Could not retrieve course details.",
+          description: error.message || "Could not retrieve course details.",
           status: "error",
           duration: 5000,
           isClosable: true,
@@ -100,7 +120,7 @@ export default function CourseDetailPage() {
     };
 
     fetchCourse();
-  }, [id, toast]); // Add toast to dependencies
+  }, [id, toast]);
 
   const handleUnenroll = async () => {
     setIsUnenrolling(true);
@@ -121,19 +141,20 @@ export default function CourseDetailPage() {
         isClosable: true,
       });
 
-      router.push("/dashboard"); // Redirect after successful unenrollment
-    } catch (err: any) {
-      console.error(err);
+      router.push("/dashboard");
+    } catch (err: unknown) {
+      const error = err as Error;
+      console.error(error);
       toast({
         title: "Error",
-        description: err.message || "Could not unenroll from course.",
+        description: error.message || "Could not unenroll from course.",
         status: "error",
         duration: 3000,
         isClosable: true,
       });
     } finally {
       setIsUnenrolling(false);
-      onClose(); // Close alert dialog
+      onClose();
     }
   };
 
@@ -189,16 +210,16 @@ export default function CourseDetailPage() {
         <Spacer />
         <Button
           colorScheme={unenrollButtonScheme}
-          size="md" // Medium size for actions
+          size="md"
           onClick={onOpen}
           isLoading={isUnenrolling}
           loadingText="Unenrolling..."
-          borderRadius="full" // Fully rounded button
+          borderRadius="full"
           shadow="md"
           _hover={{
             shadow: "lg",
             transform: "translateY(-1px)",
-            bg: useColorModeValue("red.600", "red.400"),
+            bg: unenrollHoverBg,
           }}
           transition="all 0.2s ease-in-out"
         >
@@ -222,12 +243,12 @@ export default function CourseDetailPage() {
 
       <Box mb={8}>
         <Heading size="lg" mb={4} color={headingColor} fontWeight="semibold">
-          <Icon as={FaVideo} mr={3} color={liveClassButtonScheme + ".500"} />
+          <Icon as={FaVideo} mr={3} color={`${liveClassButtonScheme}.500`} />
           Upcoming Live Classes
         </Heading>
         <Stack spacing={4}>
-          {liveClasses.length ? (
-            liveClasses.map((lc: any) => (
+          {liveClasses.length > 0 ? (
+            liveClasses.map((lc) => (
               <Box
                 key={lc._id}
                 borderWidth="1px"
@@ -235,11 +256,11 @@ export default function CourseDetailPage() {
                 p={4}
                 bg={cardBg}
                 borderColor={cardBorder}
-                shadow="sm" // Smaller shadow for inner cards
+                shadow="sm"
                 _hover={{
                   shadow: "md",
                   transform: "translateY(-2px)",
-                  bg: useColorModeValue("gray.50", "gray.750"), // Subtle hover for list items
+                  bg: hoverBg,
                 }}
                 transition="all 0.2s ease-in-out"
               >
@@ -259,10 +280,7 @@ export default function CourseDetailPage() {
                   _hover={{
                     shadow: "md",
                     transform: "translateY(-1px)",
-                    bg: useColorModeValue(
-                      liveClassButtonScheme + ".600",
-                      liveClassButtonScheme + ".400"
-                    ),
+                    bg: liveClassHoverBg,
                   }}
                   transition="all 0.2s ease-in-out"
                 >
@@ -292,13 +310,13 @@ export default function CourseDetailPage() {
           <Icon
             as={FaRegFileAlt}
             mr={3}
-            color={assignmentButtonScheme + ".500"}
+            color={`${assignmentButtonScheme}.500`}
           />
           Assignments
         </Heading>
         <Stack spacing={4}>
-          {course.assignments?.length ? (
-            course.assignments.map((a: any) => (
+          {course.assignments && course.assignments.length > 0 ? (
+            course.assignments.map((a) => (
               <Box
                 key={a._id}
                 borderWidth="1px"
@@ -310,7 +328,7 @@ export default function CourseDetailPage() {
                 _hover={{
                   shadow: "md",
                   transform: "translateY(-2px)",
-                  bg: useColorModeValue("gray.50", "gray.750"),
+                  bg: hoverBg,
                 }}
                 transition="all 0.2s ease-in-out"
               >
@@ -340,10 +358,7 @@ export default function CourseDetailPage() {
                   _hover={{
                     shadow: "md",
                     transform: "translateY(-1px)",
-                    bg: useColorModeValue(
-                      assignmentButtonScheme + ".600",
-                      assignmentButtonScheme + ".400"
-                    ),
+                    bg: assignmentHoverBg,
                   }}
                   transition="all 0.2s ease-in-out"
                 >
@@ -368,16 +383,13 @@ export default function CourseDetailPage() {
         </Stack>
       </Box>
 
-      {/* AlertDialog for Unenroll Confirmation */}
       <AlertDialog
         isOpen={isOpen}
         leastDestructiveRef={cancelRef}
         onClose={onClose}
         isCentered
       >
-        <AlertDialogOverlay
-          bg={useColorModeValue("blackAlpha.300", "blackAlpha.600")}
-        />
+        <AlertDialogOverlay bg={alertOverlayBg} />
         <AlertDialogContent
           bg={alertDialogBg}
           borderRadius="xl"
@@ -393,7 +405,7 @@ export default function CourseDetailPage() {
           </AlertDialogHeader>
 
           <AlertDialogBody color={alertDialogBodyColor}>
-            Are you sure you want to unenroll from "{course?.title}"? You will
+            Are you sure you want to unenroll from &qout;{course.title}&qout;? You will
             lose access to its content and assignments. This action cannot be
             undone.
           </AlertDialogBody>
@@ -405,7 +417,7 @@ export default function CourseDetailPage() {
               variant="ghost"
               colorScheme={cancelButtonScheme}
               borderRadius="full"
-              _hover={{ bg: useColorModeValue("gray.100", "gray.700") }}
+              _hover={{ bg: cancelHoverBg }}
             >
               Cancel
             </Button>
@@ -420,7 +432,7 @@ export default function CourseDetailPage() {
               _hover={{
                 shadow: "lg",
                 transform: "translateY(-1px)",
-                bg: useColorModeValue("red.600", "red.400"),
+                bg: unenrollHoverBg,
               }}
               transition="all 0.2s ease-in-out"
             >

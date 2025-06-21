@@ -1,8 +1,6 @@
-import mongoose from "mongoose";
+import mongoose, { Document, Schema } from "mongoose";
 
-// Define the interface for the Assignment document
-// Extends mongoose.Document (or Document<any, {}, IAssignment> for newer Mongoose versions)
-interface IAssignment extends mongoose.Document {
+interface IAssignment extends Document {
   courseId: mongoose.Types.ObjectId;
   title: string;
   description: string;
@@ -13,7 +11,7 @@ interface IAssignment extends mongoose.Document {
 }
 
 // Define the Mongoose schema for Assignment
-const AssignmentSchema = new mongoose.Schema<IAssignment>(
+const AssignmentSchema: Schema = new Schema(
   {
     courseId: {
       type: mongoose.Schema.Types.ObjectId,
@@ -43,4 +41,4 @@ const AssignmentSchema = new mongoose.Schema<IAssignment>(
 
 // Export the Mongoose model
 export default mongoose.models.Assignment ||
-  mongoose.model("Assignment", AssignmentSchema);
+  mongoose.model<IAssignment>("Assignment", AssignmentSchema);

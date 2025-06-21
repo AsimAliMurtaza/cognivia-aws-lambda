@@ -21,7 +21,6 @@ import {
   useColorModeValue, // For Material You-inspired theming
   Card, // Using Card component for student items
   CardBody,
-  Divider,
   Icon, // For icons in empty state
 } from "@chakra-ui/react";
 import { FiUserX, FiUsers } from "react-icons/fi"; // Added more icons
@@ -174,19 +173,20 @@ const StudentsPage = ({ params }: { params: { id: string } }) => {
   const headingColor = useColorModeValue("gray.800", "whiteAlpha.900");
   const textColor = useColorModeValue("gray.700", "gray.300");
   const lightTextColor = useColorModeValue("gray.500", "gray.400");
-  const borderColor = useColorModeValue("gray.200", "gray.700");
-  const primaryActionColor = useColorModeValue("red.500", "red.300"); // For withdraw button
+  const spinnerColor = useColorModeValue("blue.500", "blue.300");
+  const iconTextColor = useColorModeValue("gray.300", "gray.600");
 
   const loadStudents = async () => {
     setLoading(true);
     try {
       const data = await fetchStudents(id);
       setStudents(data);
-    } catch (err: any) {
+    } catch (err) {
       toast({
         title: "Error loading students",
         description:
-          err.message || "Failed to load student list. Please try again.",
+          (err as Error).message ||
+          "Failed to load student list. Please try again.",
         status: "error",
         duration: 5000,
         isClosable: true,
@@ -210,11 +210,12 @@ const StudentsPage = ({ params }: { params: { id: string } }) => {
       });
       onClose(); // Close the dialog
       await loadStudents(); // Re-fetch the student list
-    } catch (err: any) {
+    } catch (err) {
       toast({
         title: "Withdrawal failed",
         description:
-          err.message || "Could not withdraw student. Please try again later.",
+          (err as Error).message ||
+          "Could not withdraw student. Please try again later.",
         status: "error",
         duration: 5000,
         isClosable: true,
@@ -237,11 +238,7 @@ const StudentsPage = ({ params }: { params: { id: string } }) => {
 
       {loading ? (
         <Flex justify="center" alignItems="center" minH="50vh">
-          <Spinner
-            size="xl"
-            thickness="4px"
-            color={useColorModeValue("blue.500", "blue.300")}
-          />
+          <Spinner size="xl" thickness="4px" color={spinnerColor} />
         </Flex>
       ) : students.length === 0 ? (
         <VStack
@@ -253,12 +250,7 @@ const StudentsPage = ({ params }: { params: { id: string } }) => {
           textAlign="center"
           py={10}
         >
-          <Icon
-            as={FiUsers}
-            w={20}
-            h={20}
-            color={useColorModeValue("gray.300", "gray.600")}
-          />
+          <Icon as={FiUsers} w={20} h={20} color={iconTextColor} />
           <Heading size="lg" color={headingColor} mt={4}>
             No students enrolled yet
           </Heading>

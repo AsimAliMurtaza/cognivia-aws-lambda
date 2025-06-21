@@ -16,7 +16,6 @@ import {
   Card,
   CardHeader,
   CardBody,
-  CardFooter,
   IconButton,
   useDisclosure,
   Menu,
@@ -29,12 +28,12 @@ import {
   AlertDialogHeader,
   AlertDialogBody,
   AlertDialogFooter,
-  useColorModeValue, // For Material You-inspired theming
-  Tooltip, // For better UX on icons
+  useColorModeValue,
+  Tooltip,
 } from "@chakra-ui/react";
 import { useEffect, useState, useRef } from "react";
 import { useParams, useRouter } from "next/navigation";
-import AssignmentModal from "@/components/AssignmentModal"; // Assuming this component exists
+import AssignmentModal from "@/components/AssignmentModal";
 import {
   FiEdit,
   FiDownload,
@@ -43,12 +42,39 @@ import {
   FiPlus,
   FiUsers,
   FiInfo,
-} from "react-icons/fi"; // Added more icons
+} from "react-icons/fi";
+
+type Assignment = {
+  _id: string;
+  title: string;
+  description: string;
+  dueDate: string;
+  fileUrl?: string;
+};
+
+type Course = {
+  _id: string;
+  title: string;
+  description: string;
+  subject: string;
+  level: string;
+  createdAt: string;
+  joinCode: string;
+  assignments?: Assignment[];
+  students?: Student[];
+};
+
+interface Student {
+  _id: string;
+  name: string;
+  email: string;
+}
 
 export default function CourseDetailPage() {
-  const { id } = useParams();
-  const [course, setCourse] = useState<any>(null);
-  const [selectedAssignment, setSelectedAssignment] = useState<any>(null);
+  const { id } = useParams<{ id: string }>();
+  const [course, setCourse] = useState<Course | null>(null);
+  const [selectedAssignment, setSelectedAssignment] =
+    useState<Assignment | null>(null);
   const toast = useToast();
   const router = useRouter();
 
@@ -70,8 +96,6 @@ export default function CourseDetailPage() {
 
   // Material You-inspired colors
   const primaryColor = useColorModeValue("blue.600", "blue.300");
-  const secondaryColor = useColorModeValue("teal.500", "teal.200");
-  const accentColor = useColorModeValue("purple.500", "purple.200");
   const bgColor = useColorModeValue("gray.50", "gray.900");
   const cardBgColor = useColorModeValue("white", "gray.800");
   const headingColor = useColorModeValue("gray.800", "whiteAlpha.900");
@@ -79,10 +103,12 @@ export default function CourseDetailPage() {
   const lightTextColor = useColorModeValue("gray.500", "gray.400");
   const borderColor = useColorModeValue("gray.200", "gray.700");
   const spinnerColor = useColorModeValue("blue.500", "blue.300");
+  const hoverBg = useColorModeValue("gray.100", "gray.700");
+  const elevatedCardBg = useColorModeValue("gray.50", "gray.700");
 
   useEffect(() => {
     if (id) {
-      fetch(`/api/courses/${id}?populate=assignments`) // Ensure assignments are populated
+      fetch(`/api/courses/${id}?populate=assignments`)
         .then((res) => {
           if (!res.ok) {
             throw new Error(`HTTP error! status: ${res.status}`);
@@ -90,7 +116,7 @@ export default function CourseDetailPage() {
           return res.json();
         })
         .then((data) => setCourse(data))
-        .catch((error) => {
+        .catch((error: unknown) => {
           console.error("Error fetching course:", error);
           toast({
             title: "Error fetching course details",
@@ -103,21 +129,23 @@ export default function CourseDetailPage() {
           });
         });
     }
-  }, [id, toast, refresh]); // Depend on refresh to re-fetch after CUD operations
+  }, [id, toast, refresh]);
 
-  const handleEditAssignment = (assignment: any) => {
+  const handleEditAssignment = (assignment: Assignment) => {
     setSelectedAssignment(assignment);
     onAssignmentModalOpen();
   };
 
   const handleCreateAssignment = () => {
-    setSelectedAssignment(null); // Clear previous selection for new assignment
+    setSelectedAssignment(null);
     onAssignmentModalOpen();
   };
 
   const handleDeleteAssignment = async () => {
+    if (!selectedAssignment) return;
+
     try {
-      const res = await fetch(`/api/assignments/${selectedAssignment?._id}`, {
+      const res = await fetch(`/api/assignments/${selectedAssignment._id}`, {
         method: "DELETE",
       });
 
@@ -133,11 +161,12 @@ export default function CourseDetailPage() {
         duration: 3000,
         isClosable: true,
       });
-      setRefresh((prev) => !prev); // Trigger re-fetch of course data
-    } catch (error: any) {
+      setRefresh((prev) => !prev);
+    } catch (error: unknown) {
+      const err = error as Error;
       toast({
         title: "Error deleting assignment",
-        description: error.message || "Please try again later.",
+        description: err.message || "Please try again later.",
         status: "error",
         duration: 5000,
         isClosable: true,
@@ -164,7 +193,7 @@ export default function CourseDetailPage() {
   return (
     <Box p={{ base: 4, md: 8 }} maxW="7xl" mx="auto" bg={bgColor} minH="100vh">
       <Grid
-        templateColumns={{ base: "1fr", md: "2fr 1fr" }} // Adjusted ratio for main content
+        templateColumns={{ base: "1fr", md: "2fr 1fr" }}
         gap={{ base: 6, md: 10 }}
         alignItems="start"
       >
@@ -192,7 +221,7 @@ export default function CourseDetailPage() {
                     borderRadius="full"
                     variant="ghost"
                     color={textColor}
-                    _hover={{ bg: useColorModeValue("gray.100", "gray.700") }}
+                    _hover={{ bg: hoverBg }}
                   />
                 </Tooltip>
               </Flex>
@@ -276,11 +305,11 @@ export default function CourseDetailPage() {
             <CardBody>
               {course.assignments && course.assignments.length > 0 ? (
                 <Stack spacing={5}>
-                  {course.assignments.map((assignment: any) => (
+                  {course.assignments.map((assignment) => (
                     <Card
                       key={assignment._id}
                       variant="elevated"
-                      bg={useColorModeValue("gray.50", "gray.700")}
+                      bg={elevatedCardBg}
                       borderRadius="xl"
                       boxShadow="sm"
                       _hover={{
@@ -346,9 +375,7 @@ export default function CourseDetailPage() {
                               variant="ghost"
                               size="sm"
                               borderRadius="full"
-                              _hover={{
-                                bg: useColorModeValue("gray.100", "gray.600"),
-                              }}
+                              _hover={{ bg: hoverBg }}
                             />
                             <MenuList zIndex={10}>
                               <MenuItem
@@ -385,7 +412,7 @@ export default function CourseDetailPage() {
                   <Text fontSize="lg" mt={2}>
                     No assignments created yet.
                   </Text>
-                  <Text>Click "New Assignment" to add your first one.</Text>
+                  <Text>Click &quot;New Assignment&quot; to add your first one.</Text>
                 </Stack>
               )}
             </CardBody>
@@ -400,7 +427,7 @@ export default function CourseDetailPage() {
             borderRadius="2xl"
             boxShadow="xl"
             position="sticky"
-            top="4" // Keep it sticky as user scrolls
+            top="4"
             p={6}
             mb={6}
           >
@@ -436,7 +463,6 @@ export default function CourseDetailPage() {
                 >
                   Manage Students
                 </Button>
-                {/* Add a button for Live Class */}
                 <Button
                   onClick={() => router.push(`/teacher/classes/${id}/live`)}
                   colorScheme="red"
@@ -446,7 +472,7 @@ export default function CourseDetailPage() {
                   borderRadius="full"
                   leftIcon={
                     <Box as={FiMoreVertical} transform="rotate(90deg)" />
-                  } // A placeholder for a "Live" icon
+                  }
                   boxShadow="md"
                   _hover={{ boxShadow: "lg", transform: "translateY(-1px)" }}
                 >
@@ -509,9 +535,9 @@ export default function CourseDetailPage() {
       <AssignmentModal
         isOpen={isAssignmentModalOpen}
         onClose={onAssignmentModalClose}
-        courseId={id as string}
-        assignmentData={selectedAssignment}
-        onCreated={() => setRefresh((prev) => !prev)} // Callback for creation/update
+        courseId={id}
+        assignmentData={selectedAssignment ?? undefined}
+        onCreated={() => setRefresh((prev) => !prev)}
       />
 
       {/* Delete Confirmation Dialog */}
@@ -519,7 +545,7 @@ export default function CourseDetailPage() {
         isOpen={isDeleteAlertOpen}
         leastDestructiveRef={cancelRef}
         onClose={onDeleteAlertClose}
-        isCentered // Center the alert dialog
+        isCentered
       >
         <AlertDialogOverlay bg="blackAlpha.600">
           <AlertDialogContent
@@ -537,11 +563,11 @@ export default function CourseDetailPage() {
             </AlertDialogHeader>
 
             <AlertDialogBody color={textColor} mb={4}>
-              Are you sure you want to delete "
+              Are you sure you want to delete &qout;
               <Text as="span" fontWeight="bold" color={primaryColor}>
                 {selectedAssignment?.title}
               </Text>
-              "?
+              &qout;?
               <Text mt={2}>
                 This action will permanently remove the assignment and any
                 associated files.
@@ -562,7 +588,7 @@ export default function CourseDetailPage() {
                 onClick={onDeleteAlertClose}
                 borderRadius="full"
                 variant="ghost"
-                _hover={{ bg: useColorModeValue("gray.100", "gray.700") }}
+                _hover={{ bg: hoverBg }}
               >
                 Cancel
               </Button>

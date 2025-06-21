@@ -23,8 +23,17 @@ import {
 import { useRouter } from "next/navigation";
 import { FaGraduationCap } from "react-icons/fa"; // Example icon for courses
 
+interface Course {
+  _id: string;
+  title: string;
+  description: string;
+  teacher?: {
+    name: string;
+  };
+}
+
 export default function StudentCoursesPage() {
-  const [courses, setCourses] = useState<any[]>([]);
+  const [courses, setCourses] = useState<Course[]>([]);
   const [loading, setLoading] = useState(true); // Add loading state
   const [joinCode, setJoinCode] = useState("");
   const { isOpen, onOpen, onClose } = useDisclosure();
@@ -54,6 +63,22 @@ export default function StudentCoursesPage() {
   const modalInputBg = useColorModeValue("white", "gray.700");
   const modalInputBorder = useColorModeValue("gray.300", "gray.600");
   const modalInputColor = useColorModeValue("gray.800", "whiteAlpha.900");
+  const buttonBg = useColorModeValue(
+    buttonColorScheme + ".600",
+    buttonColorScheme + ".400"
+  );
+  const cancelButtonBg = useColorModeValue("gray.100", "gray.700");
+  const joinButtonBg = useColorModeValue(
+    modalButtonColorScheme + ".600",
+    modalButtonColorScheme + ".400"
+  );
+  const modalBgOverlay = useColorModeValue("blackAlpha.300", "blackAlpha.600");
+
+  const inputBorderColor = useColorModeValue("blue.500", "blue.300");
+  const inputShadow = useColorModeValue(
+    "0 0 0 1px blue.500",
+    "0 0 0 1px blue.300"
+  );
 
   const fetchCourses = async () => {
     setLoading(true); // Start loading
@@ -64,10 +89,10 @@ export default function StudentCoursesPage() {
       }
       const data = await res.json();
       setCourses(data.courses || []);
-    } catch (error: any) {
+    } catch (error) {
       toast({
         title: "Error fetching courses",
-        description: error.message || "Could not load your classes.",
+        description: (error as Error).message || "Could not load your classes.",
         status: "error",
         duration: 5000,
         isClosable: true,
@@ -160,10 +185,7 @@ export default function StudentCoursesPage() {
           _hover={{
             shadow: "lg",
             transform: "translateY(-2px)",
-            bg: useColorModeValue(
-              buttonColorScheme + ".600",
-              buttonColorScheme + ".400"
-            ),
+            bg: buttonBg,
           }}
           transition="all 0.2s ease-in-out"
         >
@@ -197,7 +219,7 @@ export default function StudentCoursesPage() {
             mb={2}
             color={courseCardDescriptionColor}
           >
-            You haven't joined any classes yet.
+            You haven&apos;t joined any classes yet.
           </Text>
           <Text
             fontSize="md"
@@ -205,8 +227,8 @@ export default function StudentCoursesPage() {
             textAlign="center"
             maxW="md"
           >
-            Click "Join via Code" to enroll in a new class, or wait for your
-            teacher to add you.
+            Click &qout;Join via Code&qout; to enroll in a new class, or wait
+            for your teacher to add you.
           </Text>
         </Flex>
       ) : (
@@ -271,10 +293,7 @@ export default function StudentCoursesPage() {
 
       {/* Modal for Joining Class */}
       <Modal isOpen={isOpen} onClose={onClose} isCentered>
-        <ModalOverlay
-          bg={useColorModeValue("blackAlpha.300", "blackAlpha.600")}
-        />{" "}
-        {/* Subtle overlay */}
+        <ModalOverlay bg={modalBgOverlay} /> {/* Subtle overlay */}
         <ModalContent
           bg={modalBg}
           borderRadius="xl" // Rounded modal corners
@@ -299,11 +318,8 @@ export default function StudentCoursesPage() {
               borderColor={modalInputBorder}
               color={modalInputColor}
               _focus={{
-                borderColor: useColorModeValue("blue.500", "blue.300"),
-                boxShadow: useColorModeValue(
-                  "0 0 0 1px blue.500",
-                  "0 0 0 1px blue.300"
-                ),
+                borderColor: inputBorderColor,
+                boxShadow: inputShadow,
               }}
             />
           </ModalBody>
@@ -317,7 +333,7 @@ export default function StudentCoursesPage() {
               variant="ghost" // Ghost variant for cancel
               colorScheme="gray"
               borderRadius="full" // Rounded button
-              _hover={{ bg: useColorModeValue("gray.100", "gray.700") }}
+              _hover={{ bg: cancelButtonBg }}
             >
               Cancel
             </Button>
@@ -330,10 +346,7 @@ export default function StudentCoursesPage() {
               _hover={{
                 shadow: "lg",
                 transform: "translateY(-1px)",
-                bg: useColorModeValue(
-                  modalButtonColorScheme + ".600",
-                  modalButtonColorScheme + ".400"
-                ),
+                bg: joinButtonBg,
               }}
               transition="all 0.2s ease-in-out"
             >

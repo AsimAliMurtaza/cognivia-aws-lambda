@@ -35,7 +35,6 @@ export async function GET() {
   await connectDB();
   const courses = await Course.find()
     .populate("createdBy", "name email") // Populate teacher details
-    .populate("liveClasses"); // Populate liveClasses if needed
 
   return NextResponse.json(courses);
 }

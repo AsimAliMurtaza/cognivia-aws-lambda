@@ -33,6 +33,6 @@ export async function GET() {
   await dbConnect();
   const classes = await LiveClass.find()
     .sort({ scheduledAt: -1 })
-    .populate("courseId", "name");
+    .populate("courseId", "name")
   return NextResponse.json(classes);
 }
