@@ -5,7 +5,6 @@ import connectDB from "@/lib/mongodb";
 import Course from "@/models/Course";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/api/auth/[...nextauth]/options";
-import User from "@/models/User";
 
 export async function POST(
   req: NextRequest,

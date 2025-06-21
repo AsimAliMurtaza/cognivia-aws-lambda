@@ -3,7 +3,6 @@ import {
   Box,
   Heading,
   Text,
-  Stack,
   Spinner,
   Button,
   useToast,
@@ -41,6 +40,11 @@ import {
   AlertDialogFooter,
   AvatarGroup,
   Avatar,
+  useColorModeValue,
+  InputGroup,
+  InputRightElement,
+  Tooltip,
+  HStack,
 } from "@chakra-ui/react";
 import { useEffect, useState, useRef } from "react";
 import { useRouter } from "next/navigation";
@@ -48,9 +52,9 @@ import {
   DeleteIcon,
   EditIcon,
   HamburgerIcon,
-  AttachmentIcon,
+  CopyIcon,
 } from "@chakra-ui/icons";
-import { FiPlus, FiBook, FiUsers } from "react-icons/fi";
+import { FiPlus, FiBook, FiUsers, FiShare2 } from "react-icons/fi";
 
 type User = {
   _id: string;
@@ -93,19 +97,13 @@ type Course = {
 export default function CoursesPage() {
   const [courses, setCourses] = useState<Course[]>([]);
   const [loading, setLoading] = useState(true);
-  const [selectedCourse, setSelectedCourse] = useState<Course | null>(null);
   const [form, setForm] = useState({
     title: "",
     description: "",
     subject: "",
     level: "",
   });
-  const [assignmentForm, setAssignmentForm] = useState({
-    title: "",
-    description: "",
-    dueDate: "",
-    file: null as File | null,
-  });
+ 
   const [isDeleteAlertOpen, setIsDeleteAlertOpen] = useState(false);
   const [itemToDelete, setItemToDelete] = useState<{
     id: string;
@@ -116,13 +114,24 @@ export default function CoursesPage() {
   const toast = useToast();
   const router = useRouter();
   const { isOpen, onOpen, onClose } = useDisclosure();
-  const {
-    isOpen: isAssignmentOpen,
-    onOpen: onAssignmentOpen,
-    onClose: onAssignmentClose,
-  } = useDisclosure();
 
   const isMobile = useBreakpointValue({ base: true, md: false });
+
+  // Color mode values
+  const bg = useColorModeValue("gray.50", "gray.900");
+  const cardBg = useColorModeValue("white", "gray.800");
+  const headingColor = useColorModeValue("gray.800", "whiteAlpha.900");
+  const textColor = useColorModeValue("gray.600", "gray.300");
+  const lightTextColor = useColorModeValue("gray.500", "gray.400");
+  const borderColor = useColorModeValue("gray.200", "gray.700");
+  const highlightColor = useColorModeValue("teal.500", "blue.400");
+  const spinnerColor = useColorModeValue("teal.500", "blue.300");
+  const buttonColor = useColorModeValue("teal", "blue");
+  const avatarGroupBg = useColorModeValue("blue.100", "blue.700");
+  const avatarGroupColor = useColorModeValue("blue.800", "blue.100");
+  const inputCodeBg = useColorModeValue("blue.50", "blue.900");
+  const inputCodeColor = useColorModeValue("blue.700", "blue.200");
+  const hoverBg = useColorModeValue("gray.100", "gray.700");
 
   useEffect(() => {
     fetchCourses();
@@ -137,7 +146,14 @@ export default function CoursesPage() {
       setCourses(data);
       setLoading(false);
     } catch (error) {
-      toast({ title: "Error loading courses", status: "error" });
+      console.error("Error fetching courses:", error);
+      toast({
+        title: "Error loading classes",
+        description: "Failed to fetch your classes.",
+        status: "error",
+        duration: 5000,
+        isClosable: true,
+      });
       setLoading(false);
     }
   };
@@ -148,20 +164,6 @@ export default function CoursesPage() {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
-  const handleAssignmentChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
-  ) => {
-    setAssignmentForm({ ...assignmentForm, [e.target.name]: e.target.value });
-  };
-
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files && e.target.files[0]) {
-      setAssignmentForm({
-        ...assignmentForm,
-        file: e.target.files[0],
-      });
-    }
-  };
 
   const handleCreateCourse = async () => {
     try {
@@ -173,65 +175,29 @@ export default function CoursesPage() {
 
       if (res.ok) {
         const newCourse = await res.json();
-        toast({ title: "Course created!", status: "success" });
+        toast({
+          title: "Class created!",
+          description: "Your new class has been successfully added.",
+          status: "success",
+          duration: 3000,
+          isClosable: true,
+        });
         setCourses([...courses, newCourse]);
         onClose();
         setForm({ title: "", description: "", subject: "", level: "" });
       } else {
-        throw new Error("Failed to create course");
+        const errorData = await res.json();
+        throw new Error(errorData.message || "Failed to create class");
       }
-    } catch (error) {
-      toast({ title: "Error creating course", status: "error" });
-    }
-  };
-
-  const handleCreateAssignment = async () => {
-    if (!selectedCourse) return;
-
-    try {
-      const formData = new FormData();
-      formData.append("title", assignmentForm.title);
-      formData.append("description", assignmentForm.description);
-      formData.append("dueDate", assignmentForm.dueDate);
-      formData.append("courseId", selectedCourse._id);
-
-      if (assignmentForm.file) {
-        formData.append("file", assignmentForm.file);
-      }
-
-      const res = await fetch("/api/assignments", {
-        method: "POST",
-        body: formData,
+    } catch (error: unknown) {
+      const err = error as Error;
+      toast({
+        title: "Error creating class",
+        description: err.message || "Please try again.",
+        status: "error",
+        duration: 5000,
+        isClosable: true,
       });
-
-      if (res.ok) {
-        const newAssignment = await res.json();
-        toast({ title: "Assignment created!", status: "success" });
-
-        // Update the selected course with the new assignment
-        const updatedCourses = courses.map((course) => {
-          if (course._id === selectedCourse._id) {
-            return {
-              ...course,
-              assignments: [...(course.assignments || []), newAssignment],
-            };
-          }
-          return course;
-        });
-
-        setCourses(updatedCourses);
-        setAssignmentForm({
-          title: "",
-          description: "",
-          dueDate: "",
-          file: null,
-        });
-        onAssignmentClose();
-      } else {
-        throw new Error("Failed to create assignment");
-      }
-    } catch (error) {
-      toast({ title: "Error creating assignment", status: "error" });
     }
   };
 
@@ -251,9 +217,14 @@ export default function CoursesPage() {
       if (res.ok) {
         if (itemToDelete.type === "course") {
           setCourses(courses.filter((c) => c._id !== itemToDelete.id));
-          toast({ title: "Course deleted", status: "success" });
+          toast({
+            title: "Class deleted",
+            description: "The class and all its assignments have been removed.",
+            status: "success",
+            duration: 3000,
+            isClosable: true,
+          });
         } else {
-          // Update the course to remove the deleted assignment
           const updatedCourses = courses.map((course) => {
             if (course.assignments?.some((a) => a._id === itemToDelete.id)) {
               return {
@@ -266,13 +237,30 @@ export default function CoursesPage() {
             return course;
           });
           setCourses(updatedCourses);
-          toast({ title: "Assignment deleted", status: "success" });
+          toast({
+            title: "Assignment deleted",
+            description: "The assignment has been removed.",
+            status: "success",
+            duration: 3000,
+            isClosable: true,
+          });
         }
       } else {
-        throw new Error("Failed to delete");
+        const errorData = await res.json();
+        throw new Error(
+          errorData.message || `Failed to delete ${itemToDelete.type}`
+        );
       }
-    } catch (error) {
-      toast({ title: "Error deleting", status: "error" });
+    } catch (error: unknown) {
+      const err = error as Error;
+      toast({
+        title: "Deletion error",
+        description:
+          err.message || "Could not delete the item. Please try again.",
+        status: "error",
+        duration: 5000,
+        isClosable: true,
+      });
     } finally {
       setIsDeleteAlertOpen(false);
       setItemToDelete(null);
@@ -284,102 +272,140 @@ export default function CoursesPage() {
     setIsDeleteAlertOpen(true);
   };
 
-  const formatDate = (dateString: string) => {
-    const options: Intl.DateTimeFormatOptions = {
-      year: "numeric",
-      month: "short",
-      day: "numeric",
-      hour: "2-digit",
-      minute: "2-digit",
-    };
-    return new Date(dateString).toLocaleDateString(undefined, options);
-  };
-
   const getStudentAvatars = (students: User[] | string[]) => {
-    if (students.length === 0) return null;
+    if (!students || students.length === 0) return null;
 
-    // If students are just IDs (strings)
-    if (typeof students[0] === "string") {
+    // Check if students are populated User objects
+    const isPopulated =
+      typeof students[0] === "object" &&
+      (students[0] as User).name !== undefined;
+
+    if (isPopulated) {
       return (
         <AvatarGroup size="sm" max={3}>
-          <Avatar name="Student" />
+          {(students as User[]).map((student) => (
+            <Avatar
+              key={student._id}
+              name={student?.name || "Unknown User"}
+              src={student?.avatar}
+              bg={avatarGroupBg}
+              color={avatarGroupColor}
+            />
+          ))}
         </AvatarGroup>
       );
     }
+    // If students are just IDs or not fully populated, show a count
+    return (
+      <Badge
+        colorScheme="blue"
+        variant="subtle"
+        borderRadius="full"
+        px={3}
+        py={1}
+        ml={1}
+        display="flex"
+        alignItems="center"
+      >
+        <FiUsers style={{ marginRight: "4px" }} />
+        <Text fontSize="xs" fontWeight="bold">
+          {students.length}
+        </Text>
+      </Badge>
+    );
+  };
 
-    // // If students are populated user objects
-    // return (
-    //   <AvatarGroup size="sm" max={3}>
-    //     {(students as User[]).map((student) => (
-    //       <Avatar key={student._id} name={student?.name} src={student?.avatar} />
-    //     ))}
-    //   </AvatarGroup>
-    // );
+  const handleCopyJoinCode = (code: string) => {
+    navigator.clipboard.writeText(code);
+    toast({
+      title: "Join code copied!",
+      description: "You can now share this code with your students.",
+      status: "info",
+      duration: 3000,
+      isClosable: true,
+    });
   };
 
   if (loading) {
     return (
-      <Flex justify="center" align="center" minH="100vh">
-        <Spinner size="xl" thickness="4px" color="blue.500" />
+      <Flex justify="center" align="center" minH="100vh" bg={bg}>
+        <Spinner size="xl" thickness="4px" color={spinnerColor} />
       </Flex>
     );
   }
 
   return (
-    <Box p={{ base: 4, md: 6 }} bg="gray.50" minH="100vh">
-      <Flex justify="space-between" align="center" mb={6}>
-        <Heading size="xl" color="gray.800">
+    <Box p={{ base: 4, md: 8 }} bg={bg} minH="100vh">
+      <Flex
+        justify="space-between"
+        align={{ base: "flex-start", md: "center" }}
+        mb={8}
+        direction={{ base: "column", md: "row" }}
+      >
+        <Heading
+          size={{ base: "lg", md: "xl" }}
+          color={headingColor}
+          mb={{ base: 4, md: 0 }}
+        >
           My Classes
         </Heading>
         <Button
           leftIcon={<FiPlus />}
-          colorScheme="blue"
+          colorScheme={buttonColor}
           onClick={onOpen}
           size={isMobile ? "md" : "lg"}
+          borderRadius="full"
+          px={isMobile ? 6 : 8}
+          py={isMobile ? 3 : 6}
+          fontWeight="semibold"
+          boxShadow="md"
+          _hover={{ boxShadow: "lg", transform: "translateY(-2px)" }}
         >
-          Create Class
+          Create New Class
         </Button>
       </Flex>
 
       {courses.length === 0 ? (
-        <Box
-          textAlign="center"
+        <Flex
+          direction="column"
+          align="center"
+          justify="center"
+          minH="60vh"
+          bg={cardBg}
+          borderRadius="xl"
+          boxShadow="lg"
           p={10}
-          bg="white"
-          borderRadius="lg"
-          boxShadow="sm"
+          textAlign="center"
         >
           <FiBook
-            size="48px"
-            color="#4299E1"
-            style={{ margin: "0 auto 16px" }}
+            size="64px"
+            color={highlightColor}
+            style={{ marginBottom: "24px" }}
           />
-          <Heading size="md" mb={2}>
-            No classes yet
+          <Heading size="lg" mb={3} color={headingColor}>
+            No Classes Yet
           </Heading>
-          <Text color="gray.600" mb={4}>
-            Create your first class to get started
+          <Text color={textColor} fontSize="lg" mb={6} maxW="md">
+            It looks like you haven&apos;t created any classes. Start by
+            creating your first one!
           </Text>
-          <Button colorScheme="blue" onClick={onOpen}>
-            Create Class
-          </Button>
-        </Box>
+        </Flex>
       ) : (
         <SimpleGrid columns={{ base: 1, md: 2, lg: 3 }} spacing={6}>
           {courses.map((course) => (
             <Card
               key={course._id}
-              bg="white"
-              borderRadius="lg"
-              boxShadow="sm"
-              borderTop="4px solid"
-              borderColor="blue.400"
-              _hover={{ transform: "translateY(-2px)", boxShadow: "md" }}
-              transition="all 0.2s"
+              bg={cardBg}
+              borderRadius="xl"
+              boxShadow="md"
+              borderTop="6px solid"
+              borderColor={highlightColor}
+              _hover={{ transform: "translateY(-4px)", boxShadow: "xl" }}
+              transition="all 0.3s ease-in-out"
             >
               <CardHeader pb={0}>
-                <Flex justify="space-between" align="center">
-                  <Heading size="md" color="gray.800">
+                <Flex justify="space-between" align="flex-start" mb={2}>
+                  <Heading size="md" color={headingColor} flex="1">
                     {course.title}
                   </Heading>
                   <Menu>
@@ -388,18 +414,26 @@ export default function CoursesPage() {
                       aria-label="Options"
                       icon={<HamburgerIcon />}
                       variant="ghost"
-                      zIndex={1000}
                       size="sm"
+                      borderRadius="full"
+                      _hover={{ bg: hoverBg }}
                     />
-                    <MenuList>
+                    <MenuList zIndex={10}>
                       <MenuItem
                         icon={<EditIcon />}
                         onClick={() =>
                           router.push(`/teacher/classes/${course._id}`)
                         }
                       >
-                        View Class
+                        View Class Details
                       </MenuItem>
+                      <MenuItem
+                        icon={<FiShare2 />}
+                        onClick={() => handleCopyJoinCode(course.joinCode)}
+                      >
+                        Copy Join Code
+                      </MenuItem>
+                      <Divider />
                       <MenuItem
                         icon={<DeleteIcon />}
                         color="red.500"
@@ -410,37 +444,110 @@ export default function CoursesPage() {
                     </MenuList>
                   </Menu>
                 </Flex>
-                <Text fontSize="sm" color="gray.500" mt={1}>
-                  {course.subject} • {course.level}
-                </Text>
+                <Badge
+                  colorScheme="purple"
+                  variant="subtle"
+                  borderRadius="full"
+                  px={3}
+                  py={1}
+                  fontSize="xs"
+                  fontWeight="semibold"
+                >
+                  {course.subject}
+                </Badge>
+                <Badge
+                  colorScheme="blue"
+                  variant="subtle"
+                  borderRadius="full"
+                  px={3}
+                  py={1}
+                  fontSize="xs"
+                  fontWeight="semibold"
+                  ml={2}
+                >
+                  {course.level}
+                </Badge>
               </CardHeader>
 
               <CardBody py={4}>
-                <Text fontSize="sm" color="gray.600" noOfLines={3}>
-                  {course.description || "No description provided"}
+                <Text fontSize="sm" color={textColor} noOfLines={3} mb={3}>
+                  {course.description ||
+                    "No description provided for this class."}
                 </Text>
 
-                <Flex align="center" mt={4}>
-                  <Text fontSize="sm" mr={2}>
+                <HStack align="center" mt={4} spacing={2}>
+                  <Text fontSize="sm" color={lightTextColor}>
                     Students:
                   </Text>
                   {getStudentAvatars(course.students) || (
-                    <Text fontSize="sm" color="gray.500">
-                      {course.students.length === 0
-                        ? "No students enrolled"
-                        : `${course.students.length} student(s)`}
+                    <Text
+                      fontSize="sm"
+                      color={lightTextColor}
+                      fontStyle="italic"
+                    >
+                      No students enrolled
                     </Text>
                   )}
+                  {course.students.length > 0 &&
+                    typeof course.students[0] === "string" && (
+                      <Text fontSize="sm" color={lightTextColor}>
+                        ({course.students.length} enrolled)
+                      </Text>
+                    )}
+                </HStack>
+
+                <Flex mt={4} justify="space-between" align="center">
+                  <Text
+                    fontSize="sm"
+                    color={lightTextColor}
+                    fontWeight="medium"
+                  >
+                    Join Code:
+                  </Text>
+                  <InputGroup size="sm" w="auto">
+                    <Input
+                      value={course.joinCode}
+                      isReadOnly
+                      size="sm"
+                      variant="filled"
+                      borderRadius="md"
+                      pr="3rem"
+                      fontWeight="bold"
+                      color={inputCodeColor}
+                      bg={inputCodeBg}
+                    />
+                    <InputRightElement width="3rem">
+                      <Tooltip
+                        label="Copy Join Code"
+                        aria-label="Copy join code tooltip"
+                      >
+                        <IconButton
+                          aria-label="Copy join code"
+                          icon={<CopyIcon />}
+                          size="xs"
+                          variant="ghost"
+                          onClick={() => handleCopyJoinCode(course.joinCode)}
+                          colorScheme={buttonColor}
+                        />
+                      </Tooltip>
+                    </InputRightElement>
+                  </InputGroup>
                 </Flex>
               </CardBody>
 
-              <CardFooter pt={0}>
+              <CardFooter
+                pt={0}
+                display="flex"
+                justifyContent="space-between"
+                gap={3}
+              >
                 <Button
                   leftIcon={<FiUsers />}
-                  colorScheme="blue"
-                  variant="outline"
+                  colorScheme={buttonColor}
+                  variant="solid"
                   size="sm"
-                  w="full"
+                  flex="1"
+                  borderRadius="lg"
                   onClick={() =>
                     router.push(`/teacher/classes/${course._id}/students`)
                   }
@@ -455,57 +562,75 @@ export default function CoursesPage() {
 
       {/* Create Course Modal */}
       <Modal isOpen={isOpen} onClose={onClose} size="lg" isCentered>
-        <ModalOverlay />
-        <ModalContent>
-          <ModalHeader>Create New Class</ModalHeader>
-          <ModalCloseButton />
+        <ModalOverlay bg="blackAlpha.600" />
+        <ModalContent bg={cardBg} borderRadius="xl" boxShadow="2xl">
+          <ModalHeader color={headingColor} fontSize="2xl" pt={6} pb={2}>
+            Create New Class
+          </ModalHeader>
+          <ModalCloseButton mt={2} />
           <ModalBody pb={6}>
             <FormControl mb={4} isRequired>
-              <FormLabel>Class Title</FormLabel>
+              <FormLabel color={textColor}>Class Title</FormLabel>
               <Input
                 name="title"
                 value={form.title}
                 onChange={handleChange}
                 placeholder="e.g. Algebra 101"
+                focusBorderColor={highlightColor}
               />
             </FormControl>
             <FormControl mb={4}>
-              <FormLabel>Description</FormLabel>
+              <FormLabel color={textColor}>Description</FormLabel>
               <Textarea
                 name="description"
                 value={form.description}
                 onChange={handleChange}
-                placeholder="Describe your class..."
+                placeholder="Describe your class in detail..."
                 rows={3}
+                focusBorderColor={highlightColor}
               />
             </FormControl>
-            <Flex gap={4}>
+            <Flex gap={4} direction={{ base: "column", sm: "row" }}>
               <FormControl mb={4} isRequired>
-                <FormLabel>Subject</FormLabel>
+                <FormLabel color={textColor}>Subject</FormLabel>
                 <Input
                   name="subject"
                   value={form.subject}
                   onChange={handleChange}
                   placeholder="e.g. Mathematics"
+                  focusBorderColor={highlightColor}
                 />
               </FormControl>
               <FormControl mb={4} isRequired>
-                <FormLabel>Level</FormLabel>
+                <FormLabel color={textColor}>Level</FormLabel>
                 <Input
                   name="level"
                   value={form.level}
                   onChange={handleChange}
-                  placeholder="e.g. Grade 10"
+                  placeholder="e.g. Grade 10, University"
+                  focusBorderColor={highlightColor}
                 />
               </FormControl>
             </Flex>
           </ModalBody>
 
-          <ModalFooter>
-            <Button variant="outline" mr={3} onClick={onClose}>
+          <ModalFooter borderTop="1px solid" borderColor={borderColor} pt={4}>
+            <Button
+              variant="ghost"
+              mr={3}
+              onClick={onClose}
+              borderRadius="full"
+              _hover={{ bg: hoverBg }}
+            >
               Cancel
             </Button>
-            <Button colorScheme="blue" onClick={handleCreateCourse}>
+            <Button
+              colorScheme={buttonColor}
+              onClick={handleCreateCourse}
+              borderRadius="full"
+              boxShadow="md"
+              _hover={{ boxShadow: "lg" }}
+            >
               Create Class
             </Button>
           </ModalFooter>
@@ -518,28 +643,47 @@ export default function CoursesPage() {
         leastDestructiveRef={cancelRef}
         onClose={() => setIsDeleteAlertOpen(false)}
       >
-        <AlertDialogOverlay>
-          <AlertDialogContent>
-            <AlertDialogHeader fontSize="lg" fontWeight="bold">
+        <AlertDialogOverlay bg="blackAlpha.600">
+          <AlertDialogContent bg={cardBg} borderRadius="xl" boxShadow="2xl">
+            <AlertDialogHeader
+              fontSize="2xl"
+              fontWeight="bold"
+              color={headingColor}
+              pt={6}
+            >
               Delete {itemToDelete?.type === "course" ? "Class" : "Assignment"}
             </AlertDialogHeader>
 
-            <AlertDialogBody>
+            <AlertDialogBody color={textColor}>
               Are you sure you want to delete this {itemToDelete?.type}?
               {itemToDelete?.type === "assignment" &&
                 " The associated file will be deleted from storage."}
-              This action cannot be undone.
+              <Text mt={2} fontWeight="bold" color="red.400">
+                This action cannot be undone.
+              </Text>
             </AlertDialogBody>
 
-            <AlertDialogFooter>
+            <AlertDialogFooter
+              borderTop="1px solid"
+              borderColor={borderColor}
+              pt={4}
+            >
               <Button
                 ref={cancelRef}
                 onClick={() => setIsDeleteAlertOpen(false)}
+                borderRadius="full"
+                variant="ghost"
+                _hover={{ bg: hoverBg }}
               >
                 Cancel
               </Button>
-              <Button colorScheme="red" onClick={handleDelete} ml={3}>
-                Delete
+              <Button
+                colorScheme="red"
+                onClick={handleDelete}
+                ml={3}
+                borderRadius="full"
+              >
+                Yes, Delete
               </Button>
             </AlertDialogFooter>
           </AlertDialogContent>

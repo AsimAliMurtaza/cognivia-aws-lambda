@@ -11,6 +11,7 @@ export interface ICourse extends Document {
   joinCode: string;
   teacher: mongoose.Types.ObjectId;
   assignments: mongoose.Types.ObjectId[];
+  liveClasses: mongoose.Types.ObjectId[];
 }
 
 const CourseSchema: Schema = new Schema(
@@ -32,7 +33,9 @@ const CourseSchema: Schema = new Schema(
     },
     joinCode: { type: String, unique: true },
     assignments: [{ type: mongoose.Schema.Types.ObjectId, ref: "Assignment" }],
+    liveClasses: [{ type: mongoose.Schema.Types.ObjectId, ref: "LiveClass" }],
   },
+
   { timestamps: true }
 );
 

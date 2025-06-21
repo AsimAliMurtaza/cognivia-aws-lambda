@@ -24,12 +24,27 @@ import {
 } from "@chakra-ui/react";
 import { useState, useRef, useEffect } from "react";
 
-interface Props {
+interface Assignment {
+  _id: string;
+  title: string;
+  description: string;
+  dueDate: string;
+  fileUrl?: string;
+}
+
+interface AssignmentModalProps {
   isOpen: boolean;
   onClose: () => void;
   courseId: string;
   onCreated: () => void;
-  assignmentData?: any;
+  assignmentData?: Assignment;
+}
+
+interface AssignmentForm {
+  title: string;
+  description: string;
+  dueDate: string;
+  fileUrl: string;
 }
 
 export default function AssignmentModal({
@@ -38,8 +53,8 @@ export default function AssignmentModal({
   courseId,
   onCreated,
   assignmentData,
-}: Props) {
-  const [form, setForm] = useState({
+}: AssignmentModalProps) {
+  const [form, setForm] = useState<AssignmentForm>({
     title: "",
     description: "",
     dueDate: "",
@@ -71,7 +86,8 @@ export default function AssignmentModal({
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) => {
-    setForm({ ...form, [e.target.name]: e.target.value });
+    const { name, value } = e.target;
+    setForm((prev) => ({ ...prev, [name]: value }));
   };
 
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -91,8 +107,9 @@ export default function AssignmentModal({
       if (!res.ok) throw new Error("Upload failed");
 
       const data = await res.json();
-      setForm({ ...form, fileUrl: data.url });
+      setForm((prev) => ({ ...prev, fileUrl: data.url }));
     } catch (error) {
+      console.error("File upload error:", error);
       toast({
         title: "File upload failed",
         description: "Please try again",
@@ -127,6 +144,7 @@ export default function AssignmentModal({
       onCreated();
       onClose();
     } catch (error) {
+      console.error("Submission error:", error);
       toast({
         title: assignmentData
           ? "Failed to update assignment"
@@ -139,6 +157,8 @@ export default function AssignmentModal({
   };
 
   const handleDelete = async () => {
+    if (!assignmentData) return;
+
     setIsSubmitting(true);
     try {
       const res = await fetch(`/api/assignments/${assignmentData._id}`, {
@@ -155,6 +175,7 @@ export default function AssignmentModal({
       onClose();
       setIsDeleteOpen(false);
     } catch (error) {
+      console.error("Deletion error:", error);
       toast({
         title: "Failed to delete assignment",
         status: "error",
@@ -253,7 +274,7 @@ export default function AssignmentModal({
               Delete Assignment
             </AlertDialogHeader>
             <AlertDialogBody>
-              Are you sure you want to delete "{assignmentData?.title}"? This
+              Are you sure you want to delete &quot;{assignmentData?.title}&quot;? This
               action cannot be undone.
             </AlertDialogBody>
             <AlertDialogFooter>

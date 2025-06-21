@@ -5,7 +5,6 @@ import dbConnect from "@/lib/mongodb";
 import Assignment from "@/models/Assignment";
 import AssignmentSubmission from "@/models/AssignmentSubmission";
 import { uploadFileToS3 } from "@/lib/s3";
-import { use } from "react";
 
 export async function POST(
   req: NextRequest,

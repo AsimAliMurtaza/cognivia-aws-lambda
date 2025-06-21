@@ -30,33 +30,27 @@ import {
   useBreakpointValue,
 } from "@chakra-ui/react";
 import {
-  BiHome,
   BiMenuAltLeft,
   BiMenu,
   BiUser,
   BiLogOut,
-  BiRocket,
   BiArchiveIn,
 } from "react-icons/bi";
 import {
-  FiBarChart2,
   FiSettings,
-  FiMessageSquare,
-  FiBook,
-  FiEdit,
 } from "react-icons/fi";
 import { IconType } from "react-icons/lib";
 import { motion, AnimatePresence } from "framer-motion";
 import { useSession, signOut } from "next-auth/react";
 import SessionLogger from "@/components/SessionLogger";
-import { MdClass } from "react-icons/md";
+import { MdMeetingRoom } from "react-icons/md";
 import { FaHome } from "react-icons/fa";
 
 const MotionBox = motion(Box);
 
 const modules = [
-  { name: "Home", icon: FaHome, path: "/teacher" },
-  { name: "Classes", icon: MdClass, path: "/teacher/classes" },
+  { name: "Home", icon: FaHome, path: "/teacher/classes" },
+  { name: "Live Classes", icon: MdMeetingRoom, path: "/teacher/live-classes" },
   { name: "Archived Classes", icon: BiArchiveIn, path: "/teacher/archive" },
   { name: "Settings", icon: FiSettings, path: "/teacher/settings" },
 ];

@@ -23,7 +23,7 @@ import {
 import { motion } from "framer-motion";
 import { FcGoogle } from "react-icons/fc";
 import { FaGithub } from "react-icons/fa";
-import { FiArrowLeft, FiSun, FiMoon } from "react-icons/fi";
+import {  FiSun, FiMoon } from "react-icons/fi";
 
 export default function LoginPage() {
   const [email, setEmail] = useState<string>("");
@@ -113,6 +113,7 @@ export default function LoginPage() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
         >
+          
           <Flex
             bg={cardBgColor}
             boxShadow="lg"
@@ -123,6 +124,7 @@ export default function LoginPage() {
             borderRadius="20px"
             position="relative"
           >
+            
             {/* 🌗 Dark Mode Toggle Button */}
             <IconButton
               aria-label="Toggle Dark Mode"
@@ -147,27 +149,11 @@ export default function LoginPage() {
               textAlign="center"
               color={textColor}
             >
-              <Heading size="lg" fontWeight="thin">
-                Welcome to
-              </Heading>
               <Heading size="2xl" fontWeight="thin" mb={4}>
                 Cognivia
               </Heading>
-              <Text fontSize="md">Sign in to continue or...</Text>
-              <Button
-                color={textColor}
-                _hover={{ color: "blue.900" }}
-                variant="link"
-                onClick={() => router.push("/")}
-              >
-                <FiArrowLeft
-                  style={{
-                    marginRight: "8px",
-                    marginBottom: "2px",
-                    fontSize: "2em",
-                  }}
-                />
-              </Button>
+              <Text fontSize="md">Sign in to continue</Text>
+             
             </Box>
 
             {/* Right Section */}

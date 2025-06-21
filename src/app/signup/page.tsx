@@ -102,6 +102,15 @@ export default function SignUpPage() {
           p={8}
           w="auto"
         >
+          <Button
+            color="blue.500"
+            variant="link"
+            fontSize="sm"
+            _hover={{ color: buttonHoverColor }}
+            onClick={() => router.push("/")}
+          >
+            <FiArrowLeft style={{ marginRight: "8px", fontSize: "2em" }} />
+          </Button>
           <Grid templateColumns={{ base: "1fr", md: "1fr 1fr" }} gap={6}>
             {/* Left Content */}
             <GridItem
@@ -111,24 +120,12 @@ export default function SignUpPage() {
               justifyContent="center"
               textAlign="center"
             >
-              <Heading size="lg" fontWeight="thin" color={textColor}>
-                Welcome to
-              </Heading>
               <Heading size="2xl" fontWeight="thin" color={textColor} mb={4}>
                 Cognivia
               </Heading>
               <Text fontSize="sm" color={textColor} mt={4}>
                 Create an account to get started.
               </Text>
-              <Button
-                color="blue.500"
-                variant="link"
-                fontSize="sm"
-                _hover={{ color: buttonHoverColor }}
-                onClick={() => router.push("/")}
-              >
-                <FiArrowLeft style={{ marginRight: "8px", fontSize: "2em" }} />
-              </Button>
             </GridItem>
 
             {/* Right Side */}
@@ -174,8 +171,8 @@ export default function SignUpPage() {
                         <option value="" disabled selected>
                           Select your role
                         </option>
-                        <option value="Student" >Student</option>
-                        <option value="Teacher" disabled selected>Teacher</option>
+                        <option value="Student">Student</option>
+                        <option value="Teacher">Teacher</option>
                       </Select>
                     </FormControl>
                   </motion.div>

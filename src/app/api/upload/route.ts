@@ -1,12 +1,6 @@
 import { NextRequest } from "next/server";
 import { uploadFileToS3 } from "@/lib/s3";
 
-export const config = {
-  api: {
-    bodyParser: false,
-  },
-};
-
 export async function POST(req: NextRequest) {
   const formData = await req.formData();
   const file = formData.get("file") as File;

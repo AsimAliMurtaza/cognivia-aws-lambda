@@ -29,7 +29,7 @@ export async function middleware(req: NextRequest) {
   }
 
     if (isUserDashboard && token?.role === "teacher") {
-    return NextResponse.redirect(new URL("/teacher", req.url));
+    return NextResponse.redirect(new URL("/teacher/classes", req.url));
   }
 
   let userAction = "";
