@@ -37,6 +37,7 @@ export async function GET(req: NextRequest) {
     try {
       data = JSON.parse(raw);
     } catch (err) {
+      console.log(err)
       return NextResponse.json(
         { error: "Invalid JSON from Lambda", raw },
         { status: 500 }
