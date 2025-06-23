@@ -15,7 +15,9 @@ export async function GET() {
 export async function POST(req: NextRequest) {
   const session = await getServerSession(authOptions);
   const token = session?.user?.accessToken;
-  console.log("Token from session:", token);
+  if (process.env.NODE_ENV !== "production") {
+    console.log("Token from session:", token);
+  }
 
   if (!token) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
