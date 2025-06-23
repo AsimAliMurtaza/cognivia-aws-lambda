@@ -1,34 +1,39 @@
 // lib/gemini.ts
-import axios from "axios";
 
-const GEMINI_API_URL = process.env.GEMINI_API_URL;
+const LAMBDA_API_URL = process.env.LAMBDA_GEMINI_API_URL!;
+
+type GeminiApiResponse = {
+  output?: {
+    candidates?: Array<{
+      content?: {
+        parts?: Array<{
+          text?: string;
+        }>;
+      };
+    }>;
+  };
+};
 
 export async function generateGeminiContent(prompt: string) {
   try {
-    // Security Measure 4: HTTPS Use
-    const response = await axios.post(
-      `${GEMINI_API_URL}?key=${process.env.GEMINI_API_KEY}`,
-      {
-        contents: [
-          {
-            parts: [{ text: prompt }],
-          },
-        ],
+    const response = await fetch(LAMBDA_API_URL, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
       },
-      {
-        headers: {
-          "Content-Type": "application/json",
-        },
-      }
-    );
+      body: JSON.stringify({ prompt }),
+    });
 
-    const data = response.data as {
-      candidates?: { content?: { parts?: { text: string }[] } }[];
-    };
-    const reply = data.candidates?.[0]?.content?.parts?.[0]?.text;
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+
+    const data: GeminiApiResponse = await response.json();
+    const reply = data.output?.candidates?.[0]?.content?.parts?.[0]?.text;
+
     return reply || "No response.";
   } catch (error) {
-    console.error("Gemini API Error:", error);
+    console.error("Lambda Gemini Error:", error);
     return "Something went wrong.";
   }
 }

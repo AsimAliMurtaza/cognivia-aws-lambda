@@ -1,40 +1,37 @@
+// app/api/courses/route.ts
 import { NextRequest, NextResponse } from "next/server";
-import connectDB from "@/lib/mongodb";
-import Course from "@/models/Course";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/api/auth/[...nextauth]/options";
-import { generateJoinCode } from "@/lib/generateJoinCode";
 
-export async function POST(req: NextRequest) {
-  await connectDB();
-  const session = await getServerSession(authOptions);
-  if (!session || session?.user?.role !== "teacher") {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 403 });
-  }
-
-  const { title, description, subject, level } = await req.json();
-  const code = generateJoinCode();
-
-  const course = await Course.create({
-    title,
-    description,
-    subject,
-    level,
-    liveClasses: [],
-    createdBy: session.user.id,
-    joinCode: code,
-    teacher: session.user.id,
-    assignments: [],
-    students: [],
-  });
-
-  return NextResponse.json(course);
-}
+const LAMBDA_COURSE_API_URL = process.env.LAMBDA_COURSE_API_URL || "";
 
 export async function GET() {
-  await connectDB();
-  const courses = await Course.find()
-    .populate("createdBy", "name email") // Populate teacher details
+  const res = await fetch(LAMBDA_COURSE_API_URL);
+  const data = await res.json();
 
-  return NextResponse.json(courses);
+  return NextResponse.json(data, { status: res.status });
+}
+
+export async function POST(req: NextRequest) {
+  const session = await getServerSession(authOptions);
+  const token = session?.user?.accessToken;
+  console.log("Token from session:", token);
+
+  if (!token) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
+  const body = await req.json();
+
+  const res = await fetch(LAMBDA_COURSE_API_URL, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    },
+    body: JSON.stringify(body),
+  });
+
+  const data = await res.json();
+  return NextResponse.json(data, { status: res.status });
 }

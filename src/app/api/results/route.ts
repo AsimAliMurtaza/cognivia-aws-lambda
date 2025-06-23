@@ -1,49 +1,42 @@
+// app/api/results/route.ts
 import { NextRequest, NextResponse } from "next/server";
-import dbConnect from "@/lib/mongodb";
-import QuizResult from "@/models/QuizResult";
-import Quiz from "@/models/Quiz";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/app/api/auth/[...nextauth]/options";
+
+const LAMBDA_RESULTS_URL = process.env.LAMBDA_RESULTS_URL || "";
 
 export async function POST(req: NextRequest) {
   try {
+    const session = await getServerSession(authOptions);
+    const token = session?.user?.accessToken;
+
+    if (!token) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
     const body = await req.json();
 
-    const { userID, quizID, score, total, percentage } = body;
+    const lambdaRes = await fetch(LAMBDA_RESULTS_URL, {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(body),
+    });
 
-    if (
-      !userID ||
-      !quizID ||
-      score == null ||
-      total == null ||
-      percentage == null
-    ) {
+    const data = await lambdaRes.json();
+
+    if (!lambdaRes.ok) {
       return NextResponse.json(
-        { error: "Missing required fields" },
-        { status: 400 }
+        { error: "Lambda error", details: data },
+        { status: lambdaRes.status }
       );
     }
 
-    await dbConnect();
-
-    const result = await QuizResult.create({
-      userID,
-      quizID,
-      score,
-      total,
-      percentage,
-    });
-
-    const updatedQuiz = await Quiz.findOneAndUpdate(
-      { _id: quizID },
-      { score, isTaken: true },
-      { new: true }
-    );
-
-    return NextResponse.json(
-      { message: "Result stored successfully", result, updatedQuiz },
-      { status: 201 }
-    );
-  } catch (error) {
-    console.error("Error storing quiz result:", error);
+    return NextResponse.json(data, { status: 201 });
+  } catch (err) {
+    console.error("Proxy error:", err);
     return NextResponse.json(
       { error: "Internal Server Error" },
       { status: 500 }

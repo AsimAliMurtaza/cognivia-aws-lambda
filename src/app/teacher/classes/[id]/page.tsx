@@ -108,7 +108,7 @@ export default function CourseDetailPage() {
 
   useEffect(() => {
     if (id) {
-      fetch(`/api/courses/${id}?populate=assignments`)
+      fetch(`/api/courses/${id}`)
         .then((res) => {
           if (!res.ok) {
             throw new Error(`HTTP error! status: ${res.status}`);
