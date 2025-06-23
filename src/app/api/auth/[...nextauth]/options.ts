@@ -155,11 +155,11 @@ export const authOptions: NextAuthOptions = {
         token.id = user.id;
         token.name = user.name;
         token.email = user.email;
-        token.image = user.image;
-        token.gender = user.gender;
-        token.is2FAEnabled = user.is2FAEnabled;
-        token.is2FAVerified = user.is2FAVerified;
-        token.credits = user.credits || 0;
+        // token.image = user.image;
+        // token.gender = user.gender;
+        // token.is2FAEnabled = user.is2FAEnabled;
+        // token.is2FAVerified = user.is2FAVerified;
+        // token.credits = user.credits || 0;
         if (user) {
           token.role = user.role || "user";
         }

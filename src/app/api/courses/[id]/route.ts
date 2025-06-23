@@ -1,28 +1,29 @@
 import { NextRequest, NextResponse } from "next/server";
-import connectDB from "@/lib/mongodb";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/api/auth/[...nextauth]/options";
-
-import Assignment from "@/models/Assignment";
+import connectDB from "@/lib/mongodb";
 import CourseModel from "@/models/Course";
-import mongoose from "mongoose";
+
+
+const LAMBDA_URL =
+   process.env.LAMBDA_COURSES_CRUD_URL || "";
 
 export async function GET(
-  req: Request,
+  req: NextRequest,
   { params }: { params: { id: string } }
 ) {
-  await connectDB();
+  const session = await getServerSession(authOptions);
+  const token = session?.user?.accessToken;
 
-  mongoose.models.Assignment = Assignment; // Ensure Assignment model is registered
+  const res = await fetch(`${LAMBDA_URL}?courseId=${params.id}`, {
+    method: "GET",
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
 
-  // ❗️This works because Assignment is registered above
-  const course = await CourseModel.findById(params.id).populate("assignments");
-
-  if (!course) {
-    return new Response("Not found", { status: 404 });
-  }
-
-  return Response.json(course);
+  const data = await res.json();
+  return NextResponse.json(data, { status: res.status });
 }
 
 export async function PUT(

@@ -94,11 +94,7 @@ export default function ViewNotesPage() {
 
     setLoading(true);
     try {
-      const res = await fetch(
-        `/api/notes?userId=${encodeURIComponent(userID)}&skip=${
-          page * limit
-        }&limit=${limit}`
-      );
+      const res = await fetch(`/api/notes?skip=${page * limit}&limit=${limit}`);
       if (!res.ok) {
         const errorData = await res.json();
         throw new Error(errorData?.error || "Failed to fetch notes");
