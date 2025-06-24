@@ -1,4 +1,3 @@
-// app/api/save-notes/route.ts
 import { NextRequest, NextResponse } from "next/server";
 import dbConnect from "@/lib/mongodb";
 import Note from "@/models/Note"; 

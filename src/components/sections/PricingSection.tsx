@@ -37,8 +37,6 @@ const pricingPlans = [
 ];
 
 export default function PricingSection() {
-
-  // Material You inspired colors
   const bgColor = useColorModeValue("white", "gray.900");
   const textColor = useColorModeValue("gray.700", "gray.200");
   const subTextColor = useColorModeValue("gray.600", "gray.400");
@@ -79,7 +77,11 @@ export default function PricingSection() {
                 color={subTextColor}
                 maxW="2xl"
               >
-                Choose the perfect plan for your learning journey
+                Choose the perfect plan for your learning journey with no hidden
+                fees or surprises. Upgrade or cancel anytime.
+              </Text>
+              <Text fontSize="md" color={textColor} fontWeight="thin">
+                (Applicable to AI-Based features only)
               </Text>
             </VStack>
           </motion.div>

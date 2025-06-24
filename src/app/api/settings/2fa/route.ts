@@ -1,4 +1,3 @@
-// /app/api/settings/2fa/route.ts
 import { getServerSession } from "next-auth";
 import { authOptions } from "../../auth/[...nextauth]/options";
 import dbConnect from "@/lib/mongodb";

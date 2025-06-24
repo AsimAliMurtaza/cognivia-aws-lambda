@@ -50,7 +50,6 @@ export async function DELETE(
   try {
     await connectDB();
 
-    // First get the assignment to find the course ID
     const assignment = await Assignment.findById(params.id);
     if (!assignment) {
       return NextResponse.json(
@@ -59,17 +58,16 @@ export async function DELETE(
       );
     }
 
-    // Delete the assignment
+    if (assignment.fileUrl !== "") {
+      await deleteFileFromS3(assignment.fileUrl);
+    }
+
     await Assignment.findByIdAndDelete(params.id);
 
-    // Remove assignment ID from course's assignments array
     await Course.findByIdAndUpdate(assignment.courseId, {
       $pull: { assignments: params.id },
     });
 
-    // TODO: Add code here to delete any associated files from storage
-    // For example, if using AWS S3, you would call the S3 delete method here
-    await deleteFileFromS3(assignment.fileUrl);
 
     return NextResponse.json(
       { message: "Assignment deleted successfully" },

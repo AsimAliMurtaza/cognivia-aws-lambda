@@ -50,7 +50,6 @@ export default function ContactSection() {
 
     setLoading(true);
 
-    // Simulating form submission
     setTimeout(() => {
       toast({
         title: "Message Sent!",
@@ -66,7 +65,6 @@ export default function ContactSection() {
     }, 2000);
   };
 
-  // Dynamic Colors for Light & Dark Mode
   const bgColor = useColorModeValue("white", "gray.800");
   const textColor = useColorModeValue("gray.800", "gray.100");
   const subTextColor = useColorModeValue("gray.600", "gray.300");
@@ -202,7 +200,7 @@ export default function ContactSection() {
                     <List spacing={4}>
                       <ListItem display="flex" alignItems="center">
                         <ListIcon as={FaEnvelope} color={primaryColor} />
-                        <Text color={textColor}>support@cognivia.com</Text>
+                        <Text color={textColor}>masimalimurtaza@gmail.com</Text>
                       </ListItem>
                       <ListItem display="flex" alignItems="center">
                         <ListIcon as={FaPhoneAlt} color={primaryColor} />

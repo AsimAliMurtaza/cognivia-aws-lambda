@@ -60,7 +60,12 @@ const HeroSection = () => {
                   fontWeight="bold"
                 >
                   <Typewriter
-                    words={["Cognivia.", "AI Quizzes.", "Adaptive Learning."]}
+                    words={[
+                      "Cognivia.",
+                      "AI Quizzes.",
+                      "Adaptive Learning.",
+                      "Live Sessions.",
+                    ]}
                     loop={true}
                     cursor
                     cursorStyle="|"
@@ -77,9 +82,12 @@ const HeroSection = () => {
                 color={useColorModeValue("gray.600", "gray.300")}
                 maxW={{ base: "100%", lg: "90%" }}
               >
-                The AI-powered platform that adapts to your learning style,
-                helping you master topics faster with personalized quizzes and
-                real-time feedback.
+                The AI-powered platform for learners and educators. Create,
+                share, and discover quizzes, assignments, virtual classrooms to
+                enhance your learning journey. We make education engaging and
+                effective.
+                <br />
+                Join a community of learners and educators today!
               </Text>
 
               <Flex gap={4} mt={4} flexWrap="wrap">

@@ -41,8 +41,8 @@ const Footer = () => {
             {/* <Link href="#" _hover={{ color: linkHoverColor }}>
               Investor Relations
             </Link> */}
-            <Link href="#" _hover={{ color: linkHoverColor }}>
-              Contact Us
+            <Link href="/about" _hover={{ color: linkHoverColor }}>
+              About Us
             </Link>
           </Stack>
 
