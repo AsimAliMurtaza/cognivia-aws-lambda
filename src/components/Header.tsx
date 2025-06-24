@@ -17,6 +17,8 @@ import {
   VStack,
   Button,
   useColorModeValue,
+  Link,
+  Divider,
 } from "@chakra-ui/react";
 import { HamburgerIcon } from "@chakra-ui/icons";
 import DarkModeToggle from "./DarkModeToggle";
@@ -28,11 +30,18 @@ export default function Header() {
   const router = useRouter();
   const { isOpen, onOpen, onClose } = useDisclosure();
 
-  // Dynamic colors for light & dark mode
   const bgColor = useColorModeValue("white", "gray.900");
   const textColor = useColorModeValue("gray.700", "gray.100");
   const hoverColor = useColorModeValue("blue.500", "blue.300");
   const colorScheme = useColorModeValue("teal", "blue");
+  const buttonBgHover = useColorModeValue("gray.100", "gray.700");
+
+  const navLinks = [
+    { name: "About Us", type: "route", path: "/about" },
+    { name: "Features", type: "scroll", to: "features" },
+    { name: "Pricing", type: "scroll", to: "pricing" },
+    { name: "Contact", type: "scroll", to: "contact" },
+  ];
 
   return (
     <Box
@@ -54,17 +63,19 @@ export default function Header() {
             color={useColorModeValue("teal.500", "blue.300")}
             cursor="pointer"
             onClick={() => router.push("/")}
+            fontFamily="heading" 
+            fontWeight="extrabold"
           >
             Cognivia
           </Heading>
 
           {/* Desktop Navigation */}
           <Flex display={{ base: "none", md: "flex" }} align="center">
-            {["About Us", "Features", "Pricing", "Contact"].map(
-              (link, index) => (
-                <MotionBox key={index} whileTap={{ scale: 0.95 }} mx={4}>
+            {navLinks.map((link, index) => (
+              <MotionBox key={index} whileTap={{ scale: 0.95 }} mx={4}>
+                {link.type === "scroll" ? (
                   <ScrollLink
-                    to={link.toLowerCase().replace(" ", "")}
+                    to={link.to as string}
                     smooth={true}
                     duration={500}
                     offset={-70}
@@ -77,13 +88,28 @@ export default function Header() {
                       color={textColor}
                       borderRadius="full"
                       _hover={{ color: hoverColor, textDecoration: "none" }}
+                      aria-label={`Go to ${link.name} section`}
                     >
-                      {link}
+                      {link.name}
                     </Button>
                   </ScrollLink>
-                </MotionBox>
-              )
-            )}
+                ) : (
+                  <Link href={link.path} _hover={{ textDecoration: "none" }}>
+                    <Button
+                      variant="ghost"
+                      fontSize="lg"
+                      fontWeight="medium"
+                      color={textColor}
+                      borderRadius="full"
+                      _hover={{ color: hoverColor }}
+                      aria-label={`Go to ${link.name} page`}
+                    >
+                      {link.name}
+                    </Button>
+                  </Link>
+                )}
+              </MotionBox>
+            ))}
           </Flex>
 
           {/* Buttons (Auth & Dark Mode Toggle) */}
@@ -94,13 +120,27 @@ export default function Header() {
             <HStack spacing={2} display={{ base: "none", md: "flex" }}>
               <Button
                 onClick={() => router.push("/login")}
-                variant="solid"
-                borderColor={hoverColor}
+                variant="outline"
+                borderColor={useColorModeValue("teal.400", "blue.300")}
+                color={useColorModeValue("teal.600", "blue.300")}
                 borderRadius="full"
-                colorScheme={colorScheme}
                 size="lg"
+                px={6}
+                _hover={{ bg: useColorModeValue("blue.50", "blue.800") }}
               >
                 Sign In
+              </Button>
+              <Button
+                onClick={() => router.push("/signup")}
+                colorScheme={colorScheme}
+                borderRadius="full"
+                size="lg"
+                px={6}
+                fontWeight="bold"
+                shadow="md"
+                _hover={{ shadow: "lg", transform: "translateY(-1px)" }}
+              >
+                Get Started
               </Button>
             </HStack>
 
@@ -110,9 +150,11 @@ export default function Header() {
               aria-label="Open Menu"
               icon={<HamburgerIcon />}
               variant="ghost"
-              fontSize="xl"
+              fontSize="2xl"
               borderRadius="full"
               onClick={onOpen}
+              color={textColor}
+              _hover={{ bg: useColorModeValue("gray.100", "gray.700") }}
             />
           </Flex>
         </Flex>
@@ -123,60 +165,95 @@ export default function Header() {
         <DrawerOverlay />
         <DrawerContent bg={bgColor}>
           <DrawerCloseButton />
-          <VStack spacing={4} mt={16} align="stretch" px={4}>
-            {["About Us", "Features", "Pricing", "Contact"].map(
-              (link, index) => (
-                <ScrollLink
-                  key={index}
-                  to={link.toLowerCase().replace(" ", "")}
-                  smooth={true}
-                  duration={500}
-                  offset={-70}
-                  spy={true}
-                  onClick={onClose}
-                >
-                  <Button
-                    variant="ghost"
-                    fontSize="xl"
-                    fontWeight="medium"
-                    color={textColor}
-                    w="full"
-                    justifyContent="flex-start"
-                    _hover={{ color: hoverColor }}
+          <VStack spacing={4} mt={16} align="stretch" px={6}>
+            {" "}
+            {navLinks.map((link, index) => (
+              <Box key={index} w="full">
+                {" "}
+                {link.type === "scroll" ? (
+                  <ScrollLink
+                    to={link.to as string}
+                    smooth={true}
+                    duration={500}
+                    offset={-70}
+                    spy={true}
+                    onClick={onClose}
                   >
-                    {link}
-                  </Button>
-                </ScrollLink>
-              )
-            )}
-
-            <Box py={2}>
+                    <Button
+                      variant="ghost"
+                      fontSize="xl"
+                      fontWeight="medium"
+                      color={textColor}
+                      w="full"
+                      justifyContent="flex-start"
+                      borderRadius="md"
+                      _hover={{
+                        color: hoverColor,
+                        bg: buttonBgHover,
+                      }}
+                    >
+                      {link.name}
+                    </Button>
+                  </ScrollLink>
+                ) : (
+                  <Link href={link.path} _hover={{ textDecoration: "none" }}>
+                    <Button
+                      variant="ghost"
+                      fontSize="xl"
+                      fontWeight="medium"
+                      color={textColor}
+                      w="full"
+                      justifyContent="flex-start"
+                      borderRadius="md"
+                      onClick={onClose}
+                      _hover={{
+                        color: hoverColor,
+                        bg: buttonBgHover,
+                      }}
+                    >
+                      {link.name}
+                    </Button>
+                  </Link>
+                )}
+              </Box>
+            ))}
+            <Divider
+              my={2}
+              borderColor={useColorModeValue("gray.200", "gray.700")}
+            />{" "}
+            <VStack spacing={3} mt={4}>
+              {" "}
               <Button
                 onClick={() => {
                   onClose();
                   router.push("/login");
                 }}
                 variant="outline"
-                color={hoverColor}
-                borderColor={hoverColor}
+                color={useColorModeValue("blue.600", "blue.300")}
+                borderColor={useColorModeValue("blue.400", "blue.300")}
                 w="full"
                 borderRadius="full"
-                _hover={{ bg: useColorModeValue("gray.100", "gray.700") }}
+                size="lg"
+                _hover={{ bg: useColorModeValue("blue.50", "blue.800") }}
               >
-                Login
+                Sign In
               </Button>
-            </Box>
-            <Button
-              onClick={() => {
-                onClose();
-                router.push("/signup");
-              }}
-              colorScheme="blue"
-              w="full"
-              borderRadius="full"
-            >
-              Get Started
-            </Button>
+              <Button
+                onClick={() => {
+                  onClose();
+                  router.push("/signup");
+                }}
+                colorScheme="blue"
+                w="full"
+                borderRadius="full"
+                size="lg"
+                fontWeight="bold"
+                shadow="md"
+                _hover={{ shadow: "lg", transform: "translateY(-1px)" }}
+              >
+                Get Started
+              </Button>
+            </VStack>
           </VStack>
         </DrawerContent>
       </Drawer>

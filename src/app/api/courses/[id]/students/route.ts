@@ -1,4 +1,3 @@
-// src/app/api/courses/[id]/students/route.ts
 import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import dbConnect from "@/lib/mongodb";
@@ -24,5 +23,5 @@ export async function GET(
     return NextResponse.json({ error: "Course not found" }, { status: 404 });
   }
 
-  return NextResponse.json(course.students); // Return only students
+  return NextResponse.json(course.students); 
 }

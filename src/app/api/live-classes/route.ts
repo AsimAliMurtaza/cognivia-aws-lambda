@@ -23,7 +23,7 @@ export async function POST(req: Request) {
   });
 
   await Course.findByIdAndUpdate(courseId, {
-    $push: { liveClasses: newClass._id }, // or add a direct link
+    $push: { liveClasses: newClass._id }, 
   });
 
   return NextResponse.json(newClass);

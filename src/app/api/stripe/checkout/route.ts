@@ -1,9 +1,8 @@
-// app/api/stripe/checkout/route.ts
 import { NextResponse } from "next/server";
 import Stripe from "stripe";
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
-  apiVersion: "2025-04-30.basil", // or use latest
+  apiVersion: "2025-04-30.basil", 
 });
 
 export async function POST(req: Request) {

@@ -3,7 +3,7 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/api/auth/[...nextauth]/options";
 
 const LAMBDA_NOTES_API_URL =
-  process.env.LAMBDA_NOTES_API_URL; // 🔁 replace this
+  process.env.LAMBDA_NOTES_API_URL;
 
 export async function GET(req: NextRequest) {
   try {
@@ -37,7 +37,7 @@ export async function GET(req: NextRequest) {
     try {
       data = JSON.parse(raw);
     } catch (err) {
-      console.log(err)
+      console.error("JSON Parse Error:", err);
       return NextResponse.json(
         { error: "Invalid JSON from Lambda", raw },
         { status: 500 }

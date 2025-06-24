@@ -90,7 +90,6 @@ export default function LogsPage() {
     try {
       let url = `/api/logging/audit?page=${currentPage}&limit=${pageSize}`;
 
-      // Add filters to URL if they're set
       if (searchEmail) url += `&email=${encodeURIComponent(searchEmail)}`;
       if (logType !== "all") url += `&type=${logType}`;
       if (actionType !== "all" && logType === "action")

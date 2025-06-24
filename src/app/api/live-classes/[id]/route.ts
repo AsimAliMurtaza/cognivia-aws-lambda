@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import connectDB from "@/lib/mongodb";
-import LiveClass from "@/models/LiveClass"; // Update path if needed
+import LiveClass from "@/models/LiveClass"; 
 
 export async function GET(
   req: Request,

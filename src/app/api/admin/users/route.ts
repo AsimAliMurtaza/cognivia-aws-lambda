@@ -1,4 +1,3 @@
-// app/api/admin/users/route.ts
 import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/api/auth/[...nextauth]/options";
@@ -9,15 +8,13 @@ const secret = process.env.NEXTAUTH_SECRET;
 
 export async function GET(req: NextRequest) {
   const session = await getServerSession(authOptions);
-  // 1. Get token from Authorization header
   const authHeader = req.headers.get("authorization");
-  const token = authHeader?.split(" ")[1]; // "Bearer <token>" → "<token>"
+  const token = authHeader?.split(" ")[1]; 
 
   if (!token) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  // 2. Validate token using next-auth
   const verifiedToken = await getToken({ req, secret, raw: true });
 
   if (!verifiedToken) {
@@ -28,7 +25,6 @@ export async function GET(req: NextRequest) {
   }
 
   console.log(req);
-  // Allow only admins
   if (session?.user?.role !== "admin") {
     return NextResponse.json({ error: "Unauthorized" }, { status: 403 });
   }

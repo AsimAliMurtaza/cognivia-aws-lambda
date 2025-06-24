@@ -1,4 +1,3 @@
-// /app/api/quizzes/[quizId]/route.ts
 import { NextRequest, NextResponse } from "next/server";
 import dbConnect from "@/lib/mongodb";
 import Quiz from "@/models/Quiz";

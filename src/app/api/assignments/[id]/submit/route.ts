@@ -19,7 +19,6 @@ export async function POST(
 
   const assignmentId = params.id;
 
-  // 📄 Get the uploaded file from FormData
   const formData = await req.formData();
   const file = formData.get("file");
 
@@ -30,7 +29,6 @@ export async function POST(
     );
   }
 
-  // 🔍 Check if assignment exists
   const assignment = await Assignment.findById(assignmentId);
   if (!assignment) {
     return NextResponse.json(
@@ -39,7 +37,6 @@ export async function POST(
     );
   }
 
-  // ⏳ Optionally check deadline
   if (assignment.dueDate && new Date(assignment.dueDate) < new Date()) {
     return NextResponse.json(
       { error: "Submission deadline has passed" },
@@ -47,7 +44,6 @@ export async function POST(
     );
   }
 
-  // ⚠️ Check if the student already submitted
   const existing = await AssignmentSubmission.findOne({
     assignmentId,
     studentId: session.user.id,
@@ -60,11 +56,9 @@ export async function POST(
     );
   }
 
-  // ☁️ Upload file to S3
   const buffer = Buffer.from(await file.arrayBuffer());
   const fileUrl = await uploadFileToS3(buffer, file.name, file.type);
 
-  // ✅ Save submission
   const submission = await AssignmentSubmission.create({
     assignmentId,
     studentId: session.user.id,
@@ -86,8 +80,8 @@ export async function GET(
   }
 
   const existing = await AssignmentSubmission.findOne({
-    assignmentId: params.id, // ✅ matches schema
-    studentId: session.user.id, // ✅ matches schema
+    assignmentId: params.id, 
+    studentId: session.user.id, 
   });
 
   if (!existing) {

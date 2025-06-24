@@ -94,7 +94,6 @@ export default function CourseDetailPage() {
   const cancelRef = useRef<HTMLButtonElement>(null);
   const [refresh, setRefresh] = useState(false);
 
-  // Material You-inspired colors
   const primaryColor = useColorModeValue("blue.600", "blue.300");
   const bgColor = useColorModeValue("gray.50", "gray.900");
   const cardBgColor = useColorModeValue("white", "gray.800");
@@ -287,19 +286,6 @@ export default function CourseDetailPage() {
                 <Heading size="lg" color={headingColor}>
                   Assignments
                 </Heading>
-                <Button
-                  onClick={handleCreateAssignment}
-                  colorScheme="teal"
-                  size="md"
-                  leftIcon={<FiPlus />}
-                  borderRadius="full"
-                  px={6}
-                  fontWeight="semibold"
-                  boxShadow="sm"
-                  _hover={{ boxShadow: "md" }}
-                >
-                  New Assignment
-                </Button>
               </Flex>
             </CardHeader>
             <CardBody>
@@ -463,21 +449,6 @@ export default function CourseDetailPage() {
                 >
                   Manage Students
                 </Button>
-                <Button
-                  onClick={() => router.push(`/teacher/classes/${id}/live`)}
-                  colorScheme="red"
-                  variant="solid"
-                  size="lg"
-                  width="full"
-                  borderRadius="full"
-                  leftIcon={
-                    <Box as={FiMoreVertical} transform="rotate(90deg)" />
-                  }
-                  boxShadow="md"
-                  _hover={{ boxShadow: "lg", transform: "translateY(-1px)" }}
-                >
-                  Start Live Class
-                </Button>
               </Stack>
             </CardBody>
           </Card>
@@ -563,11 +534,11 @@ export default function CourseDetailPage() {
             </AlertDialogHeader>
 
             <AlertDialogBody color={textColor} mb={4}>
-              Are you sure you want to delete &qout;
+              Are you sure you want to delete &quot;
               <Text as="span" fontWeight="bold" color={primaryColor}>
                 {selectedAssignment?.title}
               </Text>
-              &qout;?
+              &quot;?
               <Text mt={2}>
                 This action will permanently remove the assignment and any
                 associated files.

@@ -1,28 +1,28 @@
-// POST /api/assignments
-import { NextResponse } from "next/server";
-import connectDB from "@/lib/mongodb";
-import Assignment from "@/models/Assignment";
-import Course from "@/models/Course";
+import { NextRequest, NextResponse } from "next/server";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/app/api/auth/[...nextauth]/options";
 
-export async function POST(req: Request) {
-  try {
-    await connectDB();
-    const data = await req.json();
+const LAMBDA_URL = process.env.LAMBDA_ASSIGNMENTS_URL!;
 
-    // Create the assignment
-    const assignment = await Assignment.create(data);
+export async function POST(req: NextRequest) {
+  const session = await getServerSession(authOptions);
+  const token = session?.user?.accessToken;
 
-    // Add assignment ID to course's assignments array
-    await Course.findByIdAndUpdate(data.courseId, {
-      $push: { assignments: assignment._id },
-    });
-
-    return NextResponse.json(assignment);
-  } catch (error) {
-    console.error("Error creating assignment:", error);
-    return NextResponse.json(
-      { error: "Failed to create assignment" },
-      { status: 500 }
-    );
+  if (!token) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
+
+  const body = await req.json();
+
+  const res = await fetch(LAMBDA_URL, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    },
+    body: JSON.stringify(body),
+  });
+
+  const data = await res.json();
+  return NextResponse.json(data, { status: res.status });
 }

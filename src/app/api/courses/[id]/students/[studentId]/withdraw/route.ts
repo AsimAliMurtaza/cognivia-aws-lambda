@@ -45,9 +45,6 @@ export async function POST(
     );
     await course.save();
 
-    // Optional: Log withdrawal (if you have a separate model/table)
-    // e.g., save to Withdrawals collection
-
     return NextResponse.json({
       success: true,
       message: "Student withdrawn successfully",
