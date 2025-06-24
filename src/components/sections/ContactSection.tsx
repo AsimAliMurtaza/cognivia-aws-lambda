@@ -200,7 +200,7 @@ export default function ContactSection() {
                     <List spacing={4}>
                       <ListItem display="flex" alignItems="center">
                         <ListIcon as={FaEnvelope} color={primaryColor} />
-                        <Text color={textColor}>masimalimurtaza@gmail.com</Text>
+                        <Text color={textColor}>{process.env.REACT_APP_CONTACT_EMAIL || "support@example.com"}</Text>
                       </ListItem>
                       <ListItem display="flex" alignItems="center">
                         <ListIcon as={FaPhoneAlt} color={primaryColor} />
