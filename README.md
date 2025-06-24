@@ -1,9 +1,3 @@
-Sure, I can help you create a highly detailed and professional README for your Cognivia project, emphasizing the AWS Lambda integration for your hackathon submission. I'll structure it to acknowledge prior team contributions and highlight your solo work during the hackathon, explaining the technical benefits of your AWS Lambda implementation.
-
-Here's a draft of your updated README:
-
------
-
 # Cognivia: An AI-Enhanced Learning & Teaching Platform
 
 ## Table of Contents
