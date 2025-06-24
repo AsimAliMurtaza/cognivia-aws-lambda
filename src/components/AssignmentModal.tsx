@@ -274,7 +274,7 @@ export default function AssignmentModal({
               Delete Assignment
             </AlertDialogHeader>
             <AlertDialogBody>
-              Are you sure you want to delete &qout;{assignmentData?.title}&qout;? This
+              Are you sure you want to delete &quot;{assignmentData?.title}&quot;? This
               action cannot be undone.
             </AlertDialogBody>
             <AlertDialogFooter>
