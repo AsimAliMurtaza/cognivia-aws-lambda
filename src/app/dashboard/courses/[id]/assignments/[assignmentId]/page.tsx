@@ -28,12 +28,11 @@ interface assignmentType {
   title: string;
   description: string;
   dueDate: string;
-  fileUrl?: string; // Optional URL for the assignment file
+  fileUrl?: string;
 }
 
 export default function SubmitAssignmentPage() {
   const { assignmentId } = useParams();
-  // Ensure id is always a string, handling the case where assignmentId might be an array
   const id = Array.isArray(assignmentId) ? assignmentId[0] : assignmentId;
 
   const [assignment, setAssignment] = useState<assignmentType | null>(null);
@@ -44,7 +43,6 @@ export default function SubmitAssignmentPage() {
   const router = useRouter();
   const [submitted, setSubmitted] = useState(false);
 
-  // --- Material You-inspired Color Mode Values ---
   const pageBg = useColorModeValue("gray.50", "gray.900");
   const cardBg = useColorModeValue("white", "gray.800");
   const cardBorder = useColorModeValue("gray.100", "gray.700");
@@ -54,18 +52,15 @@ export default function SubmitAssignmentPage() {
   const strongColor = useColorModeValue("gray.800", "whiteAlpha.900");
   const dueDateColor = useColorModeValue("gray.600", "gray.300");
 
-  // File Input Colors
   const inputBg = useColorModeValue("white", "gray.700");
   const inputBorderColor = useColorModeValue("gray.300", "gray.600");
   const inputHoverBorderColor = useColorModeValue("blue.400", "blue.300");
   const inputFileColor = useColorModeValue("gray.700", "gray.200");
 
-  // Button Colors
   const submitButtonColorScheme = "teal";
   const attachedFileLinkColor = useColorModeValue("blue.600", "blue.400");
   const attachedFileLinkHoverColor = useColorModeValue("blue.700", "blue.300");
 
-  // Submission Status Message Colors
   const submittedMessageBg = useColorModeValue("green.50", "green.900");
   const submittedMessageColor = useColorModeValue("green.700", "green.300");
   const submittedMessageBorder = useColorModeValue("green.200", "green.700");
@@ -83,7 +78,6 @@ export default function SubmitAssignmentPage() {
   const iconColor = useColorModeValue("red.500", "red.400");
   const assignmentButtonColor = useColorModeValue("blue.50", "blue.900");
 
-  // Dynamic Box Shadow for focus states (can be reused)
   const focusBoxShadow = (color: string) => `0 0 0 2px ${color}`;
 
   useEffect(() => {
@@ -91,13 +85,13 @@ export default function SubmitAssignmentPage() {
       if (!id) {
         setIsLoadingAssignment(false);
         return;
-      } // Ensure ID exists
+      }
 
       setIsLoadingAssignment(true);
       try {
         const [assignmentRes, submissionRes] = await Promise.all([
           fetch(`/api/assignments/${id}`),
-          fetch(`/api/assignments/${id}/submit`), // Corrected endpoint for checking submission
+          fetch(`/api/assignments/${id}/submit`),
         ]);
 
         if (!assignmentRes.ok) {
@@ -109,15 +103,12 @@ export default function SubmitAssignmentPage() {
         const assignmentData = await assignmentRes.json();
         setAssignment(assignmentData);
 
-        // Check submission status only if assignment fetch was successful
         if (submissionRes.ok) {
           const submissionData = await submissionRes.json();
-          // Assuming a successful fetch of submission data means it exists
           setSubmitted(
-            !!submissionData && Object.keys(submissionData).length > 0
+            submissionData.submitted && Object.keys(submissionData).length > 0
           );
         } else {
-          // If no submission found (e.g., 404), treat as not submitted
           setSubmitted(false);
         }
       } catch (err) {
@@ -130,7 +121,7 @@ export default function SubmitAssignmentPage() {
           isClosable: true,
           position: "top",
         });
-        setAssignment(null); // Clear assignment if fetch fails
+        setAssignment(null);
       } finally {
         setIsLoadingAssignment(false);
       }
@@ -226,7 +217,6 @@ export default function SubmitAssignmentPage() {
     }
   };
 
-  // Loading state for the page content
   if (isLoadingAssignment) {
     return (
       <Flex justify="center" align="center" minH="80vh" bg={pageBg}>
@@ -235,7 +225,6 @@ export default function SubmitAssignmentPage() {
     );
   }
 
-  // If assignment is not found after loading
   if (!assignment) {
     return (
       <Flex
@@ -281,10 +270,10 @@ export default function SubmitAssignmentPage() {
         bg={cardBg}
         borderWidth="1px"
         borderColor={cardBorder}
-        borderRadius="2xl" // Large rounded corners for the main card
+        borderRadius="2xl"
         shadow={cardShadow}
-        p={{ base: 6, md: 8 }} // Responsive padding
-        py={{ base: 8, md: 10 }} // More vertical padding
+        p={{ base: 6, md: 8 }}
+        py={{ base: 8, md: 10 }}
       >
         <CardBody>
           <Heading
@@ -342,7 +331,7 @@ export default function SubmitAssignmentPage() {
                 rel="noopener noreferrer"
                 colorScheme="blue"
                 variant="outline"
-                size="lg" // Larger button for important actions
+                size="lg"
                 leftIcon={<FaPaperclip />}
                 borderRadius="full"
                 color={attachedFileLinkColor}
@@ -354,7 +343,7 @@ export default function SubmitAssignmentPage() {
                   shadow: "sm",
                 }}
                 transition="all 0.2s ease-in-out"
-                alignSelf="flex-start" // Align button to start
+                alignSelf="flex-start"
                 px={6}
               >
                 View Assignment Instructions
