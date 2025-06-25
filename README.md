@@ -2,28 +2,28 @@
 
 ## Table of Contents
 
-1.  [Overview](https://www.google.com/search?q=%231-overview)
-2.  [Project Vision & Problem Solved](https://www.google.com/search?q=%232-project-vision--problem-solved)
-3.  [Key Features & Benefits](https://www.google.com/search?q=%233-key-features--benefits)
-4.  [Architectural Deep Dive: Pre-Hackathon vs. Hackathon Evolution](https://www.google.com/search?q=%234-architectural-deep-dive-pre-hackathon-vs-hackathon-evolution)
-      * [Pre-Hackathon Architecture (Team Contribution)](https://www.google.com/search?q=%23pre-hackathon-architecture-team-contribution)
-      * [Hackathon Architectural Enhancements (Solo Work)](https://www.google.com/search?q=%23hackathon-architectural-enhancements-solo-work)
-      * [AWS Lambda Integration: A Detailed Flow](https://www.google.com/search?q=%23aws-lambda-integration-a-detailed-flow)
-      * [Benefits of AWS Lambda & API Gateway Migration](https://www.google.com/search?q=%23benefits-of-aws-lambda--api-gateway-migration)
-5.  [Technology Stack](https://www.google.com/search?q=%235-technology-stack)
-6.  [Prerequisites & Dependencies](https://www.google.com/search?q=%236-prerequisites--dependencies)
-7.  [Installation & Setup Instructions](https://www.google.com/search?q=%237-installation--setup-instructions)
-8.  [Usage Examples & API Documentation](https://www.google.com/search?q=%238-usage-examples--api-documentation)
-9.  [Configuration Options](https://www.google.com/search?q=%239-configuration-options)
-10. [Contributing Guidelines](https://www.google.com/search?q=%2310-contributing-guidelines)
-11. [License Information](https://www.google.com/search?q=%2311-license-information)
-12. [Acknowledgments](https://www.google.com/search?q=%2312-acknowledgments)
+1. [Overview](#1-overview)
+2. [Project Vision & Problem Solved](#2-project-vision--problem-solved)
+3. [Key Features & Benefits](#3-key-features--benefits)
+4. [Architectural Deep Dive: Pre-Hackathon vs. Hackathon Evolution](#4-architectural-deep-dive-pre-hackathon-vs-hackathon-evolution)
+   - [Pre-Hackathon Architecture (Team Contribution)](#pre-hackathon-architecture-team-contribution)
+   - [Hackathon Architectural Enhancements (Solo Work)](#hackathon-architectural-enhancements-solo-work)
+   - [AWS Lambda Integration: A Detailed Flow](#aws-lambda-integration-a-detailed-flow)
+   - [Benefits of AWS Lambda & API Gateway Migration](#benefits-of-aws-lambda--api-gateway-migration)
+5. [Technology Stack](#5-technology-stack)
+6. [Prerequisites & Dependencies](#6-prerequisites--dependencies)
+7. [Installation & Setup Instructions](#7-installation--setup-instructions)
+8. [Usage Examples & API Documentation](#8-usage-examples--api-documentation)
+9. [Configuration Options](#9-configuration-options)
+10. [Contributing Guidelines](#10-contributing-guidelines)
+11. [License Information](#11-license-information)
+12. [Acknowledgments](#12-acknowledgments)
 
 -----
 
 ## 1\. Overview
 
-Cognivia is a sophisticated, AI-powered web application meticulously crafted to revolutionize the educational landscape for both students and instructors. Built on the robust Next.js framework with React and TypeScript, this platform integrates advanced features like intelligent quiz generation, comprehensive assignment management, and personalized AI-driven learning tools. This project initially emerged as a collaborative academic endeavor and has since been significantly enhanced and optimized for scalability and performance during the AWS Lambda Hackathon.
+Cognivia is a sophisticated, AI-powered web application meticulously crafted to revolutionize the educational landscape for both students and instructors. Built on the robust Next.js framework with React and TypeScript, this platform integrates advanced features like intelligent ai quiz generation, comprehensive assignment management, and personalized AI-driven learning tools. This project initially emerged as a collaborative academic endeavor and has since been significantly enhanced and optimized for scalability and performance during the AWS Lambda Hackathon.
 
 ## 2\. Project Vision & Problem Solved
 
@@ -42,7 +42,7 @@ Cognivia offers a rich set of features designed to enhance the teaching and lear
 
   * **Secure User Authentication:**
       * Robust user lifecycle management: login, signup, forgot/reset password, email verification, and account unblocking.
-      * Role-based access control with distinct dashboards for administrators and teachers.
+      * Role-based access control with distinct dashboards for administrators, students and teachers.
   * **AI-Powered Learning & Content Generation:**
       * **AI Quiz Generation:** Dynamically generate quizzes on any topic, providing immediate, personalized assessments.
       * **AI Notes Generation:** Create detailed, concise notes from provided content or topics, aiding comprehension and study.
@@ -58,8 +58,9 @@ Cognivia offers a rich set of features designed to enhance the teaching and lear
       * Create and manage multiple classes.
       * Enroll and manage students within specific classes.
       * Schedule and manage live class sessions.
+      * Create announcements (messages) in the classes.
   * **Student Profile Management:**
-      * Students can view and update their personal profiles, track their progress, and review past activities.
+      * Students can view and update their personal profiles, track their progress, and manage subscriptions.
   * **User Experience Enhancements:**
       * **Dark Mode Toggle:** Provides a comfortable viewing experience in different lighting conditions.
       * **Session Logging:** Records user activities for audit trails, analytics, and debugging.
@@ -72,11 +73,11 @@ Cognivia's architecture has undergone a significant transformation, evolving fro
 
 ### Pre-Hackathon Architecture (Team Contribution)
 
-The initial version of Cognivia, developed as a collaborative semester project, established the foundational features of the platform. In this phase, the application followed a typical Next.js full-stack pattern where API routes were handled directly within the Next.js backend.
+The initial version of Cognivia, developed as a collaborative semester project for cloud computing course, established the foundational features of the platform. In this phase, the application followed a typical Next.js full-stack pattern where API routes were handled directly within the Next.js backend.
 
 **Key Components & Features Developed (Team Contribution):**
 
-  * **Frontend:** Implemented with React and Next.js, providing the user interface for students and teachers.
+  * **Frontend:** Implemented with React and Next.js, providing the user interface for students.
   * **Backend (Next.js API Routes):** Handled all API requests, including:
       * User authentication (login, signup, password management, email verification).
       * Basic AI features (quiz generation, notes, chatbot) by making direct calls to the Gemini API from Next.js serverless functions.
@@ -90,7 +91,7 @@ This architecture was effective for initial development and proof-of-concept, de
 
 ### Hackathon Architectural Enhancements (Solo Work)
 
-During the AWS Lambda Hackathon, the focus shifted to enhancing the platform's scalability, performance, and operational efficiency by migrating core, compute-intensive backend logic to a serverless architecture using AWS Lambda and AWS API Gateway. This re-architecture was meticulously performed by me as a solo effort, building upon the strong foundation laid by the team.
+During the AWS Lambda Hackathon, the focus shifted to enhancing the platform's scalability, performance, and operational efficiency by migrating core, compute-intensive backend logic to a serverless architecture using AWS Lambda and AWS API Gateway. This re-architecture was meticulously performed by Muhammad Asim Ali Murtaza as a solo effort, building upon the strong foundation laid by the team.
 
 **Key Features & Architectural Improvements Developed (Solo Work):**
 
@@ -107,8 +108,10 @@ During the AWS Lambda Hackathon, the focus shifted to enhancing the platform's s
       * Teachers can manage and review submitted assignments.
   * **Live Class Scheduling:**
       * Teachers gain functionality to create and manage schedules for live online classes.
+  * **Communication Workflow:**
+      * Teachers can communicate messages within their respective classes.
   * **Centralized Student Management:**
-      * Teachers can manage students within their respective classes, including enrollment and access control.
+      * Teachers can manage students within their respective classes, including access control.
 
 ### AWS Lambda Integration: A Detailed Flow
 
@@ -119,7 +122,6 @@ The integration of AWS Lambda and API Gateway was designed to create a robust an
 1.  **Frontend (Next.js Client):** The user interacts with the Next.js frontend.
 2.  **Frontend to Next.js Backend:** User actions requiring backend logic (e.g., generating a quiz, fetching notes, submitting an assignment) trigger an API request to a Next.js API route.
 3.  **Next.js Backend to AWS API Gateway:** The Next.js API route, acting as a secure intermediary, forwards the request to the appropriate AWS API Gateway endpoint.
-      * **Authentication & Authorization:** AWS API Gateway is configured with strict authorization mechanisms (e.g., IAM roles, Lambda authorizers) to ensure that only authenticated requests originating from the Next.js backend can invoke the Lambda functions. This crucial security layer protects the Lambda endpoints from direct, unauthorized external access.
 4.  **AWS API Gateway to AWS Lambda:** API Gateway routes the request to the designated AWS Lambda function.
 5.  **AWS Lambda Execution:** The Lambda function executes the specific backend logic (e.g., calls Gemini API, interacts with MongoDB, uploads to S3).
 6.  **AWS Lambda to AWS API Gateway (Response):** The Lambda function returns the processed data or confirmation.
@@ -174,16 +176,19 @@ Cognivia is built using a modern and robust technology stack:
       * **`react-scroll`:** For smooth navigation to sections within the page.
   * **Backend (Hybrid - Next.js & Serverless):**
       * **Node.js:** JavaScript runtime environment.
-      * **Next.js API Routes:** For core application logic not yet migrated to Lambda.
+      * **Next.js API Routes:** For some core application logic not yet migrated to Lambda.
       * **AWS Lambda:** Serverless compute service for running backend code without provisioning or managing servers.
       * **AWS API Gateway:** Manages API creation, publishing, maintenance, monitoring, and security for Lambda functions.
   * **Database:**
       * **MongoDB:** NoSQL database for flexible and scalable data storage.
   * **Cloud Services & APIs:**
       * **Google Gemini API:** For advanced AI functionalities (quiz generation, notes, chatbot).
-      * **Firebase:** Utilized for user authentication and potentially for client-side storage (though assignment storage is now S3).
-      * **AWS S3:** Scalable object storage for persistent storage of assignment files and other media.
-      * **NextAuth.js:** For seamless and secure authentication in Next.js applications.
+      * **Firebase:** Utilized for client-side storage of static profile assests (though assignment storage is now S3).
+      * **AWS S3:** Scalable object storage for persistent storage of assignment files.
+      * **NextAuth.js:** For seamless and secure authentication in Next.js applications including 2FA.
+      * **Upstash Redis:** For rate limiting various api calls to avoid DDoS attacks.
+      * **Stripe:** For payment processing of different pricing models.
+      * **Agora SDK:** Utilized for live sessions. 
   * **State Management:**
       * **Zustand:** A small, fast, and scalable bear-bones state-management solution.
   * **Styling:**
@@ -248,34 +253,42 @@ Follow these steps to get Cognivia running on your local machine:
     Create a `.env.local` file in the root directory of the project. Populate it with the following environment variables. Replace the placeholder values (`<Your ...>`) with your actual credentials and configurations.
 
     ```
-    # MongoDB Connection
-    MONGODB_URI=<Your MongoDB Connection String>
+     MONGODB_URI=<Your ...>
+     GOOGLE_CLIENT_ID=<Your ...>
+     GOOGLE_CLIENT_SECRET=<Your ...>
+     NEXTAUTH_SECRET=<Your ...>
+     GITHUB_CLIENT_ID=<Your ...>
+     GITHUB_CLIENT_SECRET=<Your ...>
+     EMAIL_USER=<Your ...>
+     EMAIL_PASS=<Your ...>
+     NEXTAUTH_URL=<Your ...>
+    
+     FIREBASE_APPID=<Your ...>
+     FIREBASE_MESSAGINGSENDERID=<Your ...>
+     NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET=<Your ...>
+     FIREBASE_PROJECT_ID=<Your ...>
+     FIREBASE_APIKEY=<Your ...>
+     FIREBASE_AUTH_DOMAIN=<Your ...>
 
-    # NextAuth.js Configuration
-    NEXTAUTH_SECRET=<A strong, random string for NextAuth session encryption>
-    NEXTAUTH_URL=http://localhost:3000 # Or your deployed URL (e.g., https://yourdomain.com)
-
-    # Firebase Configuration (for client-side services, e.g., auth)
-    FIREBASE_APIKEY=<Your Firebase API Key>
-    FIREBASE_AUTHDOMAIN=<Your Firebase Auth Domain>
-    FIREBASE_PROJECTID=<Your Firebase Project ID>
-    NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET=<Your Firebase Storage Bucket> # Ensure NEXT_PUBLIC_ prefix
-    FIREBASE_MESSAGINGSENDERID=<Your Firebase Messaging Sender ID>
-    FIREBASE_APPID=<Your Firebase App ID>
-
-    # Google Gemini API Configuration
-    GEMINI_API_URL=<Your Gemini API URL, e.g., https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=>
-    GEMINI_API_KEY=<Your Gemini API Key>
-
-    # AWS S3 Configuration (for assignment storage)
-    AWS_S3_BUCKET_NAME=<Your AWS S3 Bucket Name>
-    AWS_S3_REGION=<Your AWS S3 Region, e.g., us-east-1>
-    AWS_ACCESS_KEY_ID=<Your AWS Access Key ID (for server-side/Lambda)>
-    AWS_SECRET_ACCESS_KEY=<Your AWS Secret Access Key (for server-side/Lambda)>
-
-    # Nodemailer Configuration (for email services)
-    NODEMAILER_EMAIL=<Your Nodemailer Email Address (e.g., a Gmail address)>
-    NODEMAILER_PW=<Your Nodemailer App Password (for Gmail, generate from Google Account security settings)>
+     GEMINI_API_KEY=<Your ...>
+     GEMINI_API_URL=<Your ...>
+     UPSTASH_REDIS_REST_URL=<Your ...>
+     UPSTASH_REDIS_REST_TOKEN=<Your ...>
+     
+     # Stripe
+     STRIPE_SECRET_KEY=<Your ...>
+     STRIPE_WEBHOOK_SECRET=<Your ...>
+     NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=<Your ...>
+     
+     AWS_ACCESS_KEY_ID=<Your ...>
+     AWS_SECRET_ACCESS_KEY=<Your ...>
+     AWS_REGION=<Your ...>
+     S3_BUCKET_NAME=<Your ...>
+     CONTACT_EMAIL=<Your ...>
+     
+     AGORA_PRIMARY_CERTIFICATE=<Your ...>
+     AGORA_APP_ID=<Your ...>
+     AGORA_APP_CERT<Your ...>
     ```
 
     **Security Note:** `NEXTAUTH_SECRET`, `GEMINI_API_KEY`, `AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY`, `NODEMAILER_PW` are highly sensitive. Ensure they are never committed to version control and are managed securely in production environments (e.g., using AWS Secrets Manager).
@@ -449,11 +462,15 @@ We extend our sincere gratitude to the open-source community and the creators of
   * Zustand
   * NextAuth.js
   * Chakra UI
-  * Radix UI (potentially for headless components within Chakra)
   * AWS S3
   * AWS Lambda
   * AWS API Gateway
   * Nodemailer
+  * Agora
+  * Stripe
+  * Upstash Redis
+  * Vercel
+  * Mongoose
 
 **Special acknowledgment to my team members from the semester project:**
 
