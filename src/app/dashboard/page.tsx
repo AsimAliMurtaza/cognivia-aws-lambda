@@ -20,6 +20,7 @@ import {
 import { FaCheckCircle, FaChartLine, FaStickyNote } from "react-icons/fa";
 import { motion } from "framer-motion";
 import { useEffect, useState } from "react";
+import { MdDone, MdUpcoming } from "react-icons/md";
 
 const MotionCard = motion(Card);
 
@@ -27,6 +28,11 @@ const extractNoteTitle = (prompt: string): string => {
   const match = prompt.match(/:\s*(.+?)\s*(?:\(|$)/);
   return match ? match[1].trim() : prompt;
 };
+
+interface Course {
+  title: string;
+  id: string;
+}
 
 interface DashboardStatProps {
   icon: React.ElementType;
@@ -111,12 +117,20 @@ export default function DashboardPage() {
     recentQuizzes: { topic: string; createdAt: string }[];
     recentNotes: { prompt: string; createdAt: string }[];
     takenQuizCount: number;
+    upcomingAssignments: { title: string; dueDate: string; courseId: Course }[];
+    submittedAssignments: {
+      title: string;
+      dueDate: string;
+      courseId: Course;
+    }[];
   } | null>(null);
 
   const bgColor = useColorModeValue("gray.50", "gray.900");
   const cardBg = useColorModeValue("white", "gray.800");
   const secondaryText = useColorModeValue("gray.600", "gray.300");
   const accentColor = useColorModeValue("teal.500", "blue.400");
+  const borderColorAssignments = useColorModeValue("gray.200", "gray.700");
+  const bgAssignemnts = useColorModeValue("white", "gray.800");
   const bgGradientColors = useColorModeValue(
     "linear(to-br, teal.400, teal.500)",
     "linear(to-br, blue.400, blue.500)"
@@ -132,6 +146,16 @@ export default function DashboardPage() {
   const bgGradientColorsthree = useColorModeValue(
     "linear(to-bl, teal.200, teal.300)",
     "linear(to-br, blue.200, blue.300)"
+  );
+
+  const bgGradientColorsfive = useColorModeValue(
+    "linear(to-br, purple.400, purple.500)",
+    "linear(to-tl, green.300, green.500)"
+  );
+
+  const bgGradientColorssix = useColorModeValue(
+    "linear(to-br, orange.400, orange.300)",
+    "linear(to-br, green.300, green.400)"
   );
 
   const gridColumns = useBreakpointValue({
@@ -193,6 +217,8 @@ export default function DashboardPage() {
     recentNotes,
     recentQuizzes,
     takenQuizCount,
+    upcomingAssignments,
+    submittedAssignments,
   } = dashboardData;
 
   const statsData = [
@@ -219,6 +245,18 @@ export default function DashboardPage() {
       title: "Notes Created",
       value: notesCount.toString(),
       bgGradient: bgGradientColorsthree,
+    },
+    {
+      icon: MdUpcoming,
+      title: "Upcoming Assignments",
+      value: upcomingAssignments.length.toString(),
+      bgGradient: bgGradientColorsfive,
+    },
+    {
+      icon: MdDone,
+      title: "Submitted Assignments",
+      value: submittedAssignments.length.toString(),
+      bgGradient: bgGradientColorssix,
     },
   ];
 
@@ -255,6 +293,58 @@ export default function DashboardPage() {
             <DashboardStatCard key={stat.title} {...stat} />
           ))}
         </Grid>
+
+        {/* Upcoming Assignments */}
+        <MotionCard
+          initial={{ opacity: 0, y: 15 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.3, delay: 0.1 }}
+          bg={cardBg}
+          borderRadius="xl"
+          boxShadow="sm"
+        >
+          <CardHeader pb={2}>
+            <Heading
+              as="h2"
+              size="md"
+              fontWeight="semibold"
+              color={accentColor}
+            >
+              Upcoming Assignments
+            </Heading>
+          </CardHeader>
+          <CardBody>
+            {upcomingAssignments.length === 0 ? (
+              <Text fontSize="sm" color="gray.500">
+                No upcoming assignments
+              </Text>
+            ) : (
+              <Grid
+                templateColumns={{ base: "1fr", md: "repeat(2, 1fr)" }}
+                gap={4}
+              >
+                {upcomingAssignments.map((assignment) => (
+                  <Box
+                    key={assignment.title}
+                    p={4}
+                    borderWidth={1}
+                    borderColor={borderColorAssignments}
+                    borderRadius="md"
+                    bg={bgAssignemnts}
+                  >
+                    <Text fontWeight="medium">{assignment.title}</Text>
+                    <Text fontSize="sm" color={secondaryText}>
+                      Due: {new Date(assignment.dueDate).toLocaleDateString()}
+                    </Text>
+                    <Text fontSize="sm" color={secondaryText}>
+                      Course: {assignment.courseId?.title || ""}
+                    </Text>
+                  </Box>
+                ))}
+              </Grid>
+            )}
+          </CardBody>
+        </MotionCard>
 
         {/* Recent Activity */}
         <MotionCard

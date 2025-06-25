@@ -22,12 +22,15 @@ import {
   Icon,
 } from "@chakra-ui/react";
 import { FaRegFileAlt, FaVideo } from "react-icons/fa";
+import StudentCourseMessages from "@/components/StudentCourseMessages";
 
 interface Course {
   _id: string;
   title: string;
   description: string;
   liveClasses?: string[];
+  createdAt?: string;
+  messages?: string[];
   assignments?: {
     _id: string;
     title: string;
@@ -207,6 +210,7 @@ export default function CourseDetailPage() {
         >
           {course.title}
         </Heading>
+
         <Spacer />
         <Button
           colorScheme={unenrollButtonScheme}
@@ -238,6 +242,10 @@ export default function CourseDetailPage() {
       >
         <Text fontSize="lg" color={descriptionColor}>
           {course.description}
+        </Text>
+        <Text fontSize="md" color={descriptionColor} flex="1">
+          {new Date(course?.createdAt || "").toLocaleString() ||
+            "No creation date available."}
         </Text>
       </Box>
 
@@ -303,6 +311,13 @@ export default function CourseDetailPage() {
             </Box>
           )}
         </Stack>
+      </Box>
+
+      <Box mb={8}>
+        <Heading size="lg" mb={4} color={headingColor} fontWeight="semibold">
+          Course Messages
+        </Heading>
+        <StudentCourseMessages courseId={id} />
       </Box>
 
       <Box>
@@ -405,9 +420,9 @@ export default function CourseDetailPage() {
           </AlertDialogHeader>
 
           <AlertDialogBody color={alertDialogBodyColor}>
-            Are you sure you want to unenroll from &qout;{course.title}&qout;? You will
-            lose access to its content and assignments. This action cannot be
-            undone.
+            Are you sure you want to unenroll from &qout;{course.title}&qout;?
+            You will lose access to its content and assignments. This action
+            cannot be undone.
           </AlertDialogBody>
 
           <AlertDialogFooter>

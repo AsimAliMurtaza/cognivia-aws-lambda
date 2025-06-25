@@ -80,13 +80,13 @@ export async function GET(
   }
 
   const existing = await AssignmentSubmission.findOne({
-    assignmentId: params.id, 
-    studentId: session.user.id, 
+    assignmentId: params.id,
+    studentId: session.user.id,
   });
 
   if (!existing) {
     return NextResponse.json({ submitted: false });
   }
 
-  return NextResponse.json({ submitted: true, submission: existing });
+  return NextResponse.json({ submitted: true });
 }

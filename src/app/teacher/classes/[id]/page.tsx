@@ -43,6 +43,7 @@ import {
   FiUsers,
   FiInfo,
 } from "react-icons/fi";
+import CourseMessages from "@/components/CourseMessages";
 
 type Assignment = {
   _id: string;
@@ -278,7 +279,9 @@ export default function CourseDetailPage() {
               </Flex>
             </CardBody>
           </Card>
-
+          <Card bg={cardBgColor} borderRadius="2xl" mb="10" boxShadow="xl">
+            <CourseMessages courseId={id} />
+          </Card>
           {/* Assignments Section */}
           <Card bg={cardBgColor} borderRadius="2xl" boxShadow="xl">
             <CardHeader pb={2}>
@@ -398,7 +401,9 @@ export default function CourseDetailPage() {
                   <Text fontSize="lg" mt={2}>
                     No assignments created yet.
                   </Text>
-                  <Text>Click &quot;New Assignment&quot; to add your first one.</Text>
+                  <Text>
+                    Click &quot;New Assignment&quot; to add your first one.
+                  </Text>
                 </Stack>
               )}
             </CardBody>
