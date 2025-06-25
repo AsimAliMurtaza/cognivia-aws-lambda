@@ -39,7 +39,7 @@ export default function FeaturesSection() {
     {
       title: "Cognivia AI",
       description:
-        "Cognivia AI anytime, anywhere - Summzarize, Explain, Brainstorming Ideas with Cognivia AI",
+        "Cognivia AI anytime, anywhere - Summarize, Explain, Brainstorming Ideas with Cognivia AI",
       icon: MdAssistant,
     },
     {
